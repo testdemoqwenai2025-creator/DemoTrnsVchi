@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-22T11:39:50.392Z",
+  "timestamp": "2026-09-22T11:50:42.677Z",
   "baseUrl": "http://localhost:8889",
   "summary": {
     "totalPages": 26,
@@ -148,7 +148,7 @@
       "hasMain": true,
       "headerChildren": 0,
       "footerChildren": 0,
-      "mainContentLength": 399,
+      "mainContentLength": 571,
       "mainContentPreview": "Perception &amp; Sensor Fusion\n        Multi-modal ingestion (LiDAR / RADAR / RG",
       "hasInteractiveContent": false,
       "errors": []
@@ -238,7 +238,7 @@
       "hasMain": true,
       "headerChildren": 0,
       "footerChildren": 0,
-      "mainContentLength": 922,
+      "mainContentLength": 1087,
       "mainContentPreview": "V2X Communication &amp; Multi-Agent Coordination\n        Vehicle-to-Vehicle coop",
       "hasInteractiveContent": false,
       "errors": []
@@ -256,7 +256,7 @@
       "hasMain": true,
       "headerChildren": 0,
       "footerChildren": 0,
-      "mainContentLength": 1741,
+      "mainContentLength": 1926,
       "mainContentPreview": "Safety-Critical Fault Tolerance &amp; Fail-Safe\n        Fail-safe state machine,",
       "hasInteractiveContent": false,
       "errors": []
@@ -400,7 +400,7 @@
       "hasMain": true,
       "headerChildren": 0,
       "footerChildren": 0,
-      "mainContentLength": 2199,
+      "mainContentLength": 2413,
       "mainContentPreview": "Regulatory Compliance\n        Regulatory bodies require transparent audit trails",
       "hasInteractiveContent": false,
       "errors": []
@@ -418,7 +418,7 @@
       "hasMain": true,
       "headerChildren": 0,
       "footerChildren": 0,
-      "mainContentLength": 2020,
+      "mainContentLength": 2198,
       "mainContentPreview": "Automotive Black Box\n        Circular buffer edge logging, crash-survivable stor",
       "hasInteractiveContent": false,
       "errors": []
@@ -436,7 +436,7 @@
       "hasMain": true,
       "headerChildren": 0,
       "footerChildren": 0,
-      "mainContentLength": 2566,
+      "mainContentLength": 2752,
       "mainContentPreview": "OTA Pipeline Infrastructure\n        How over-the-air updates are structured: clo",
       "hasInteractiveContent": false,
       "errors": []
@@ -454,7 +454,7 @@
       "hasMain": true,
       "headerChildren": 0,
       "footerChildren": 0,
-      "mainContentLength": 2482,
+      "mainContentLength": 2647,
       "mainContentPreview": "Audit Trail &amp; Disengagement Reporting\n        Regulatory bodies require tran",
       "hasInteractiveContent": false,
       "errors": []
@@ -491,7 +491,7 @@
       "url": "http://localhost:8889/assets/app.js",
       "status": 200,
       "ok": true,
-      "sizeBytes": 17799
+      "sizeBytes": 19517
     },
     {
       "asset": "assets/data.js",

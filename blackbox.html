@@ -17,6 +17,17 @@
         <h1>Automotive Black Box</h1>
         <p>Circular buffer edge logging, crash-survivable storage, and automated synthetic re-simulation. The last 60 seconds of all sensor + control data is constantly captured in RAM; on trigger, it dumps to hardened flash for cloud re-simulation.</p>
       </div>
+
+      <!-- Cross-navigation to related regulatory pages -->
+      <div class="card mb-4">
+        <div class="card-body text-xs" style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+          <span class="text-muted" style="margin-right:8px;">Related pages:</span>
+          <a class="btn" href="regulatory.html">🛡 Regulatory Compliance →</a>
+          <a class="btn" href="audit.html">📋 Audit Trail &amp; Disengagements →</a>
+          <a class="btn" href="ota.html">☁ OTA Pipeline →</a>
+        </div>
+      </div>
+
       <div class="callout">
         <strong>Honest scope.</strong> The circular buffer, hardened flash, and cloud pipeline are NOT implemented in this UI. They are vehicle-side and cloud-side infrastructure. This page shows what these systems would look like to an operator.
       </div>

@@ -17,6 +17,17 @@
         <h1>Audit Trail &amp; Disengagement Reporting</h1>
         <p>Regulatory bodies require transparent audit trails for safety-critical failures and manual safety-driver overrides (disengagements). Every event is hash-chained for tamper evidence.</p>
       </div>
+
+      <!-- Cross-navigation to related regulatory pages -->
+      <div class="card mb-4">
+        <div class="card-body text-xs" style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+          <span class="text-muted" style="margin-right:8px;">Related pages:</span>
+          <a class="btn" href="regulatory.html">🛡 Regulatory Compliance →</a>
+          <a class="btn" href="blackbox.html" target="_blank" rel="noopener">💾 Black Box (new tab) →</a>
+          <a class="btn" href="ota.html">☁ OTA Pipeline →</a>
+        </div>
+      </div>
+
       <div class="callout">
         <strong>Honest scope.</strong> The audit trail and quarterly reports are placeholders. Real data requires the ROS 2 bridge. The disengagement cause taxonomy matches NHTSA / California DMV reporting requirements. The hash chain is a design pattern — every event would need HSM signing in production.
       </div>

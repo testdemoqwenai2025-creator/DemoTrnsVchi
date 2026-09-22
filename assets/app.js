@@ -323,6 +323,30 @@
       '</span>';
   }
 
+  // ============================== LIVE DEMO FLOATING BUTTON (Phase 9) ==============================
+  // A floating "Launch Live Demo" button on every page (bottom-left, complementing
+  // the stream indicator at bottom-right). Opens /live.html in a NEW TAB so the
+  // operator keeps their current context — the dynamic page is a pop-out, not a
+  // navigation. Not shown on /live.html itself (no point popping out of the live page).
+  function applyLiveDemoButton(activeRoute) {
+    if (activeRoute === 'live.html') return; // don't show on the live page itself
+    const existing = $('#live-demo-fab');
+    if (existing) return; // already injected
+    const fab = el('a', {
+      id: 'live-demo-fab',
+      href: 'live.html',
+      target: '_blank',
+      rel: 'noopener',
+      'aria-label': 'Launch Live Demo in a new tab',
+      title: 'Launch Live Demo (opens in new tab)',
+    });
+    fab.style.cssText = 'position:fixed; bottom:60px; left:16px; z-index:30; display:flex; align-items:center; gap:6px; padding:8px 16px; border-radius:999px; background:var(--accent); color:#0a0e0d; font-size:12px; font-weight:600; text-decoration:none; box-shadow:0 4px 12px rgba(16,185,129,0.4); transition:transform 0.15s, box-shadow 0.15s; cursor:pointer;';
+    fab.innerHTML = '▶ <span>Live Demo</span>';
+    fab.addEventListener('mouseenter', () => { fab.style.transform = 'translateY(-2px)'; fab.style.boxShadow = '0 6px 16px rgba(16,185,129,0.5)'; });
+    fab.addEventListener('mouseleave', () => { fab.style.transform = ''; fab.style.boxShadow = '0 4px 12px rgba(16,185,129,0.4)'; });
+    document.body.appendChild(fab);
+  }
+
   // ============================== INIT ==============================
   function init(activeRoute) {
     applyTheme(getStoredTheme());
@@ -341,6 +365,9 @@
 
     // Inject stream indicator (Phase 8)
     applyStreamIndicator();
+
+    // Inject floating Live Demo button (Phase 9)
+    applyLiveDemoButton(activeRoute);
 
     // Init chat if on chat page
     initChat();
