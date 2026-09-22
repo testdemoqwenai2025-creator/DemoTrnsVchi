@@ -15,17 +15,17 @@
   <main id="main">
     <div class="container">
       <section class="hero">
-        <span class="hero-eyebrow">System nominal · v0.10.0 · 19 routes · MPA</span>
+        <span class="hero-eyebrow">System nominal · v0.10.0 · 26 routes · MPA</span>
         <h1>Autonomous Vehicles &amp; Robotics<br>Operations Center</h1>
-        <p>A compartmentalized multi-page application for monitoring, commanding, and reasoning about autonomous-vehicle and robotics fleets. Every module is its own route — bookmarkable, refresh-safe, shareable. This is a real static MPA: 19 separate HTML pages, not a single landing page.</p>
+        <p>A compartmentalized multi-page application for monitoring, commanding, and reasoning about autonomous-vehicle and robotics fleets. 26 routes across 14 module compartments, 12 foundation compartments, real-time Web Worker simulation, LLM-powered AI chat, RBAC stream gating, regulatory compliance, automotive black box, OTA pipeline, and audit trail.</p>
         <div class="hero-meta">
           <span>📡 <code>20 assets</code></span>
           <span>🟢 <code>2 online</code></span>
           <span>⚠️ <code>4 faults</code></span>
           <span>⏱️ <code>telemetry @ 5 Hz</code></span>
-          <span>🌐 <code>19 routes</code></span>
-          <span>🧠 <code>14 module compartments</code></span>
-          <span>🔒 <code>NDA-free preview</code></span>
+          <span>🌐 <code>26 routes</code></span>
+          <span>🧠 <code>26 compartments (F1-F12 + M1-M14)</code></span>
+          <span>🔒 <code>NDA-free preview · 24/7</code></span>
         </div>
         <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:20px;">
           <a class="btn btn-primary" href="live.html" target="_blank" rel="noopener">▶ Dynamic Demo (opens in new tab)</a>
@@ -64,20 +64,31 @@
       </section>
 
       <section>
-        <h2>Cross-cutting pages (Phase 2 + Phase 6)</h2>
-        <p>Login with auto-fill, cross-module search, theme-scoped AI chat, GDPR privacy notice, the Phase 6 production architecture page, and the dynamic live demo pop-page.</p>
+        <h2>Regulatory &amp; Safety-Critical (Phase 9) <span class="badge badge-active">Phase 9</span></h2>
+        <p>Regulatory compliance, automotive black box, OTA pipeline, and audit trail with disengagement reporting. Available 24/7 without NDA.</p>
         <div class="grid-4">
-          <a class="module-card" href="live.html" target="_blank" rel="noopener"><div class="module-card-body"><span class="module-card-tag" style="color:var(--accent);">LIVE · Phase 6</span><h3>Live Demo</h3><p>Dynamic pop-page (5 Hz, no socket).</p></div></a>
+          <a class="module-card" href="regulatory.html"><div class="module-card-body"><span class="module-card-tag" style="color:var(--accent);">Phase 9</span><h3>Regulatory</h3><p>ISO 26262, SOTIF, UN R157, NHTSA SGO.</p></div></a>
+          <a class="module-card" href="blackbox.html" target="_blank" rel="noopener"><div class="module-card-body"><span class="module-card-tag" style="color:var(--accent);">Phase 9</span><h3>Black Box</h3><p>60s circular buffer, crash-survivable flash.</p></div></a>
+          <a class="module-card" href="ota.html"><div class="module-card-body"><span class="module-card-tag" style="color:var(--accent);">Phase 9</span><h3>OTA Pipeline</h3><p>Cloud vs private registry, hybrid recommended.</p></div></a>
+          <a class="module-card" href="audit.html"><div class="module-card-body"><span class="module-card-tag" style="color:var(--accent);">Phase 9</span><h3>Audit Trail</h3><p>Hash-chained, NHTSA SGO disengagement taxonomy.</p></div></a>
+        </div>
+      </section>
+
+      <section>
+        <h2>Cross-cutting pages (Phase 2 + Phase 6 + Phase 8 + Phase 10)</h2>
+        <p>Login with RBAC, cross-module search, LLM-powered AI chat, GDPR privacy, production architecture, dynamic demo with Web Worker + stress test, and data strategy.</p>
+        <div class="grid-4">
+          <a class="module-card" href="live.html" target="_blank" rel="noopener"><div class="module-card-body"><span class="module-card-tag" style="color:var(--accent);">LIVE</span><h3>Dynamic Demo</h3><p>5 Hz Web Worker + stress test + edge cases.</p></div></a>
           <a class="module-card" href="architecture.html"><div class="module-card-body"><span class="module-card-tag" style="color:var(--accent);">Phase 6</span><h3>Production Architecture</h3><p>8-row tech stack (C++/Jetson/AURIX).</p></div></a>
-          <a class="module-card" href="login.html"><div class="module-card-body"><span class="module-card-tag">Auth</span><h3>Login</h3><p>Auto-fill demo credentials.</p></div></a>
+          <a class="module-card" href="login.html"><div class="module-card-body"><span class="module-card-tag">Auth · RBAC</span><h3>Login</h3><p>admin/admin or testdemo/demo.</p></div></a>
           <a class="module-card" href="search.html"><div class="module-card-body"><span class="module-card-tag">Search</span><h3>Search</h3><p>Cross-module search.</p></div></a>
-          <a class="module-card" href="chat.html"><div class="module-card-body"><span class="module-card-tag">AI</span><h3>AI Chat</h3><p>Theme-scoped assistant.</p></div></a>
+          <a class="module-card" href="chat.html"><div class="module-card-body"><span class="module-card-tag">AI · LLM</span><h3>AI Chat</h3><p>LLM-powered, AV/Robotics scoped.</p></div></a>
           <a class="module-card" href="privacy.html"><div class="module-card-body"><span class="module-card-tag">GDPR</span><h3>Privacy</h3><p>Full GDPR notice.</p></div></a>
         </div>
       </section>
 
       <div class="callout">
-        <strong>This is a real MPA.</strong> 19 separate HTML files, each with its own URL, sharing CSS and JS via <code>assets/</code>. Browser back/forward works. Pages are bookmarkable. Theme toggle persists across pages via <code>localStorage</code>. Source code, type contracts, and architecture docs live in the <a href="https://github.com/testdemoqwenai2025-creator/RoboTrnsVchi" target="_blank" rel="noopener">private repo <code>RoboTrnsVchi</code></a>.
+        <strong>This is a real MPA.</strong> 26 separate HTML files, each with its own URL, sharing CSS and JS via <code>assets/</code>. Browser back/forward works. Pages are bookmarkable. Theme toggle persists across pages via <code>localStorage</code>. Available 24/7, 365 days a year on GitHub Pages — no NDA required. Source code, type contracts, architecture docs, and 9 production reference files in 6 languages (.c, .cpp, .py, .go, .scala, .tsx) live in the <a href="https://github.com/testdemoqwenai2025-creator/RoboTrnsVchi" target="_blank" rel="noopener">private repo <code>RoboTrnsVchi</code></a>.
       </div>
     </div>
   </main>
