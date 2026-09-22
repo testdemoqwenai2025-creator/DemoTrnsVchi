@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Cross-module search across fleet assets, missions, and knowledge entries.">
+  <title>Search · AV/Robotics Ops Center</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to content</a>
+  <div id="site-header"></div>
+  <div id="mobile-nav-host"></div>
+
+  <main id="main">
+    <div class="container">
+      <div class="page-header">
+        <h1>Search</h1>
+        <p>Search across the fleet registry, active missions, and the knowledge vault. Try "rover", "LIDAR_DRIFT", "Hangar 7", "rbt_01".</p>
+      </div>
+
+      <form id="search-form" role="search" style="display:flex; gap:8px; margin-bottom:24px;">
+        <input class="form-input" type="search" id="search-input" placeholder="Type a query and press Enter…" style="flex:1;" autofocus>
+        <button type="submit" class="btn btn-primary">⏎ Search</button>
+      </form>
+
+      <div id="search-results"></div>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+  <script src="assets/data.js"></script>
+  <script src="assets/app.js"></script>
+  <script>
+    AVops.init('search.html');
+    const input = document.getElementById('search-input');
+    const resultsHost = document.getElementById('search-results');
+
+    const initial = AVops.qs('q');
+    if (initial) input.value = initial;
+
+    function render(q) {
+      resultsHost.innerHTML = '';
+      if (!q.trim()) {
+        resultsHost.appendChild(AVops.el('div', { class: 'callout' }, 'Type a query and press Enter. Search covers callsigns, asset IDs, classes, statuses, mission payloads and destinations, and knowledge entries (titles, summaries, related codes).'));
+        return;
+      }
+      const ql = q.toLowerCase();
+      const assets = MockData.fleet.filter(a => (a.id + ' ' + a.callsign + ' ' + a.class + ' ' + a.status).toLowerCase().includes(ql));
+      const missions = MockData.missions.filter(m => (m.id + ' ' + m.callsign + ' ' + m.payload + ' ' + m.destination + ' ' + m.status).toLowerCase().includes(ql));
+      const knowledge = MockData.knowledge.filter(k => (k.title + ' ' + k.summary + ' ' + k.category + ' ' + k.relatedCodes.join(' ')).toLowerCase().includes(ql));
+      const total = assets.length + missions.length + knowledge.length;
+
+      resultsHost.appendChild(AVops.el('p', { class: 'text-sm text-muted' }, total + ' match' + (total === 1 ? '' : 'es') + ' for "' + q + '"'));
+
+      if (total === 0) {
+        resultsHost.appendChild(AVops.el('div', { class: 'card' }, AVops.el('div', { class: 'card-body text-center text-muted' }, 'No matches.')));
+        return;
+      }
+
+      if (assets.length) {
+        resultsHost.appendChild(sectionHeading('📡 Assets', assets.length));
+        assets.forEach(a => resultsHost.appendChild(resultCard(a.callsign, a.id + ' · ' + a.class + ' · ' + a.status + ' · battery ' + a.battery + '%', 'telemetry.html?asset=' + a.id, '🚗')));
+      }
+      if (missions.length) {
+        resultsHost.appendChild(sectionHeading('🗺 Missions', missions.length));
+        missions.forEach(m => resultsHost.appendChild(resultCard(m.callsign, m.status + ' · ' + m.payload + ' → ' + m.destination, 'missions.html', '🗺')));
+      }
+      if (knowledge.length) {
+        resultsHost.appendChild(sectionHeading('📚 Knowledge', knowledge.length));
+        knowledge.forEach(k => resultsHost.appendChild(resultCard(k.title, k.summary + ' · ' + k.relatedCodes.join(', '), 'knowledge.html', '📖')));
+      }
+    }
+    function sectionHeading(label, count) {
+      return AVops.el('h2', { class: 'mt-4', style: 'font-size:13px; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted);' }, label + ' (' + count + ')');
+    }
+    function resultCard(title, snippet, href, icon) {
+      return AVops.el('a', { class: 'search-result', href: href }, [
+        AVops.el('div', { class: 'search-result-icon' }, icon),
+        AVops.el('div', { class: 'search-result-body' }, [
+          AVops.el('div', { class: 'search-result-title' }, title),
+          AVops.el('div', { class: 'search-result-snippet' }, snippet),
+        ]),
+      ]);
+    }
+
+    document.getElementById('search-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const q = input.value.trim();
+      const u = new URL(window.location.href);
+      if (q) u.searchParams.set('q', q); else u.searchParams.delete('q');
+      window.history.replaceState({}, '', u);
+      render(q);
+    });
+
+    render(initial || '');
+  </script>
+</body>
+</html>

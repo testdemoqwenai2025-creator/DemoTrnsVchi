@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Scenario simulation runs, CI/CD pipeline stages, HIL bench status.">
+  <title>Simulation / CI-CD / HIL · AV/Robotics Ops Center</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to content</a>
+  <div id="site-header"></div>
+  <div id="mobile-nav-host"></div>
+  <main id="main">
+    <div class="container">
+      <div class="page-header">
+        <h1>Simulation, CI/CD &amp; HIL</h1>
+        <p>Scenario simulation runs, continuous-integration pipeline stages, and hardware-in-the-loop bench status.</p>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header"><div class="card-title">▶ Active simulation runs</div></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ID</th><th>Scenario</th><th>Agents</th><th>Weather</th><th>Status</th><th>Progress</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">sim_001</td><td>urban_4way_intersection</td><td class="mono">24</td><td>clear</td><td><span class="badge badge-info">running</span></td><td class="mono">62%</td></tr>
+              <tr><td class="mono">sim_002</td><td>highway_merge_zipper</td><td class="mono">18</td><td>rain</td><td><span class="badge badge-active">passed</span></td><td class="mono">100%</td></tr>
+              <tr><td class="mono">sim_003</td><td>pedestrian_jaywalk</td><td class="mono">8</td><td>clear</td><td><span class="badge badge-fault">failed</span></td><td class="mono">100%</td></tr>
+              <tr><td class="mono">sim_004</td><td>night_rain_low_vis</td><td class="mono">12</td><td>night</td><td><span class="badge badge-muted">queued</span></td><td class="mono">0%</td></tr>
+              <tr><td class="mono">sim_005</td><td>construction_zone</td><td class="mono">32</td><td>clear</td><td><span class="badge badge-info">running</span></td><td class="mono">28%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header"><div class="card-title">🛠 CI/CD pipeline</div></div>
+        <div class="card-body" style="display:flex; flex-wrap:wrap; align-items:stretch; gap:8px;">
+          <div style="flex:1; min-width:100px; border:1px solid var(--accent); border-radius:6px; padding:8px; text-align:center; background:var(--accent-dim);"><div style="font-size:12px; font-weight:600;">lint</div><div class="text-xs" style="color:var(--accent);">PASSED</div><div class="mono text-xs text-muted">12s</div></div>
+          <span class="text-muted">→</span>
+          <div style="flex:1; min-width:100px; border:1px solid var(--accent); border-radius:6px; padding:8px; text-align:center; background:var(--accent-dim);"><div style="font-size:12px; font-weight:600;">unit_tests</div><div class="text-xs" style="color:var(--accent);">PASSED</div><div class="mono text-xs text-muted">84s</div></div>
+          <span class="text-muted">→</span>
+          <div style="flex:1; min-width:100px; border:1px solid var(--accent); border-radius:6px; padding:8px; text-align:center; background:var(--accent-dim);"><div style="font-size:12px; font-weight:600;">integration</div><div class="text-xs" style="color:var(--accent);">PASSED</div><div class="mono text-xs text-muted">156s</div></div>
+          <span class="text-muted">→</span>
+          <div style="flex:1; min-width:100px; border:1px solid var(--info); border-radius:6px; padding:8px; text-align:center; background:var(--info-dim);"><div style="font-size:12px; font-weight:600;">simulation</div><div class="text-xs" style="color:var(--info);">RUNNING</div><div class="mono text-xs text-muted">428s</div></div>
+          <span class="text-muted">→</span>
+          <div style="flex:1; min-width:100px; border:1px solid var(--border); border-radius:6px; padding:8px; text-align:center;"><div style="font-size:12px; font-weight:600;">hil</div><div class="text-xs text-muted">pending</div></div>
+          <span class="text-muted">→</span>
+          <div style="flex:1; min-width:100px; border:1px solid var(--border); border-radius:6px; padding:8px; text-align:center;"><div style="font-size:12px; font-weight:600;">deploy</div><div class="text-xs text-muted">pending</div></div>
+        </div>
+      </div>
+
+      <div class="grid-2 mb-4">
+        <div class="card">
+          <div class="card-header"><div class="card-title">💻 HIL bench</div></div>
+          <div class="card-body text-sm">
+            <div class="mb-2"><span class="text-muted">Bench:</span> <span class="mono">hil_bench_01</span></div>
+            <div class="mb-2"><span class="text-muted">Connected:</span> <span class="badge badge-active">yes</span></div>
+            <div class="mb-2"><span class="text-muted">Test running:</span> <span class="badge badge-info">running</span></div>
+            <div class="mb-2"><span class="text-muted">Pass rate:</span> <span class="mono" style="color:var(--accent); font-weight:600;">94%</span></div>
+            <div style="height:6px; background:var(--panel-2); border-radius:3px; overflow:hidden;"><div style="height:100%; width:94%; background:var(--accent);"></div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">📚 Scenario library</div></div>
+          <div class="card-body text-xs">
+            <div class="mb-2">urban_4way_intersection — 24 runs · <span style="color:var(--accent);">96% pass</span></div>
+            <div class="mb-2">highway_merge_zipper — 18 runs · <span style="color:var(--warn);">78% pass</span></div>
+            <div class="mb-2">pedestrian_jaywalk — 12 runs · <span style="color:var(--accent);">88% pass</span></div>
+            <div class="mb-2">night_rain_low_vis — 8 runs · <span style="color:var(--fault);">62% pass</span></div>
+            <div>construction_zone — 6 runs · <span style="color:var(--accent);">91% pass</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">📸 Module screenshot</div></div>
+        <img src="screenshots/simulation-module.png" alt="Simulation module" style="width:100%; display:block;">
+      </div>
+    </div>
+  </main>
+  <div id="site-footer"></div>
+  <script src="assets/data.js"></script>
+  <script src="assets/app.js"></script>
+  <script>AVops.init('simulation.html');</script>
+</body>
+</html>

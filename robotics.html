@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Joint-level state, end-effector pose, gripper control, animated 7-DoF SVG schematic.">
+  <title>Robotics Console · AV/Robotics Ops Center</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to content</a>
+  <div id="site-header"></div>
+  <div id="mobile-nav-host"></div>
+  <main id="main">
+    <div class="container">
+      <div class="page-header">
+        <h1>Robotics Console</h1>
+        <p>Joint-level state, end-effector pose, and gripper control. Pick a robot to inspect its joint state.</p>
+      </div>
+      <div class="grid-2 mb-4" style="grid-template-columns: 2fr 1fr;">
+        <div class="card">
+          <div class="card-header"><div class="card-title">🔩 Joint state — <select id="robot-select" class="form-input" style="display:inline-block; width:auto;"></select></div></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>#</th><th>Joint</th><th>Pos (°)</th><th>Vel (°/s)</th><th>Torque (Nm)</th><th>Temp (°C)</th></tr></thead>
+              <tbody id="joint-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">🦾 End-effector</div></div>
+          <div class="card-body text-sm" id="ee-info"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">📸 Module screenshot</div></div>
+        <img src="screenshots/robotics-module.png" alt="Robotics module" style="width:100%; display:block;">
+      </div>
+    </div>
+  </main>
+  <div id="site-footer"></div>
+  <script src="assets/data.js"></script>
+  <script src="assets/app.js"></script>
+  <script>
+    AVops.init('robotics.html');
+    const JOINT_NAMES = ['base_yaw', 'shoulder_pitch', 'elbow_pitch', 'wrist_pitch', 'wrist_roll', 'wrist_yaw', 'gripper_rotate'];
+    const robots = MockData.robots;
+    const select = document.getElementById('robot-select');
+    robots.forEach(r => {
+      const opt = document.createElement('option');
+      opt.value = r.id; opt.textContent = r.callsign + ' (' + r.id + ')';
+      select.appendChild(opt);
+    });
+    function seededRand(seed) {
+      let s = 0; for (const c of seed) s += c.charCodeAt(0);
+      const rng = (function(s){return function(){s=(s+0x6d2b79f5)>>>0;let t=s;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296;}})(s);
+      return rng;
+    }
+    function render() {
+      const r = robots.find(x => x.id === select.value) || robots[0];
+      const rng = seededRand(r.id);
+      const tbody = document.getElementById('joint-tbody');
+      tbody.innerHTML = '';
+      for (let i = 0; i < r.jointCount; i++) {
+        const tr = document.createElement('tr');
+        const pos = (rng() * 180 - 90).toFixed(1);
+        const vel = (rng() * 30 - 15).toFixed(1);
+        const tor = (rng() * 80).toFixed(1);
+        const temp = Math.round(28 + rng() * 50);
+        tr.innerHTML = '<td class="mono">' + (i+1) + '</td><td class="mono">' + (JOINT_NAMES[i] || 'joint_' + i) + '</td><td class="mono">' + pos + '</td><td class="mono">' + vel + '</td><td class="mono">' + tor + '</td><td class="mono" style="color:' + (temp > 70 ? 'var(--warn)' : 'var(--fg)') + ';">' + temp + '</td>';
+        tbody.appendChild(tr);
+      }
+      document.getElementById('ee-info').innerHTML = '<div class="mb-2"><span class="text-muted">Gripper:</span> <span class="badge badge-active">closed</span></div><div class="mb-2"><span class="text-muted">Force:</span> <span class="mono">30.6 N</span></div><div class="mb-2"><span class="text-muted">Pose X:</span> <span class="mono">0.31 m</span></div><div class="mb-2"><span class="text-muted">Pose Y:</span> <span class="mono">0.25 m</span></div><div class="mb-2"><span class="text-muted">Pose Z:</span> <span class="mono">0.53 m</span></div>';
+    }
+    select.addEventListener('change', render);
+    render();
+  </script>
+</body>
+</html>

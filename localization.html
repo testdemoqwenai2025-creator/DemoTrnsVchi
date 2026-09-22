@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="HD maps, LiDAR odometry & SLAM, GNSS/IMU tightly-coupled fusion, visual-odometer backup.">
+  <title>Localization &amp; SLAM · AV/Robotics Ops Center</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to content</a>
+  <div id="site-header"></div>
+  <div id="mobile-nav-host"></div>
+  <main id="main">
+    <div class="container">
+      <div class="page-header">
+        <h1>Localization &amp; SLAM</h1>
+        <p>HD maps, graph-based SLAM (LeGO-LOAM), GNSS/IMU tightly-coupled fusion with RTK, and visual-odometer fallback for GPS-denied zones.</p>
+      </div>
+
+      <div class="grid-2 mb-4">
+        <div class="card">
+          <div class="card-header"><div class="card-title">🗺 HD map &amp; pose divergence</div></div>
+          <div class="card-body text-sm">
+            <div class="mb-2"><span class="text-muted">SLAM pose:</span> <span class="mono">51.476900, -0.000500</span> · heading 95° · conf 96%</div>
+            <div class="mb-2"><span class="text-muted">GNSS pose:</span> <span class="mono">51.476920, -0.000480</span> · heading 93° · conf 84%</div>
+            <div class="mb-2" style="border-top:1px solid var(--border); padding-top:8px;"><span class="text-muted">Divergence:</span> <span class="mono" style="color:var(--accent); font-weight:600;">0.42 m</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">🛰 RTK precision</div></div>
+          <div class="card-body text-sm">
+            <div class="mb-2"><span class="text-muted">Mode:</span> <span class="badge badge-active">fixed</span></div>
+            <div class="mb-2"><span class="text-muted">Satellites:</span> <span class="mono">14</span></div>
+            <div class="mb-2"><span class="text-muted">H-accuracy:</span> <span class="mono">2 cm</span></div>
+            <div class="mb-2"><span class="text-muted">V-accuracy:</span> <span class="mono">3 cm</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header"><div class="card-title">🎥 Visual odometry (backup)</div></div>
+        <div class="card-body text-sm">
+          <span class="text-muted">Status:</span> <span class="badge badge-muted">idle</span>
+          <span class="text-muted ml-4">· Feature matches:</span> <span class="mono">847</span>
+          <span class="text-muted ml-4">· Drift:</span> <span class="mono">0.18 m</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">📸 Module screenshot</div></div>
+        <img src="screenshots/localization-module.png" alt="Localization module" style="width:100%; display:block;">
+      </div>
+    </div>
+  </main>
+  <div id="site-footer"></div>
+  <script src="assets/data.js"></script>
+  <script src="assets/app.js"></script>
+  <script>AVops.init('localization.html');</script>
+</body>
+</html>

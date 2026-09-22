@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Pedestrian intention modelling, multi-hypothesis trajectory forecasting, occlusion reasoning, scene graph.">
+  <title>Prediction &amp; Intent · AV/Robotics Ops Center</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to content</a>
+  <div id="site-header"></div>
+  <div id="mobile-nav-host"></div>
+  <main id="main">
+    <div class="container">
+      <div class="page-header">
+        <h1>Prediction &amp; Intent</h1>
+        <p>Pedestrian intention modelling, multi-hypothesis trajectory forecasting, occlusion reasoning, and contextual scene-graph generation.</p>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header"><div class="card-title">👥 Tracked agents with intentions</div></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ID</th><th>Class</th><th>Position (m)</th><th>Intention</th><th>Prob</th><th>TTC</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">agent_01</td><td>vehicle</td><td class="mono">12.4, 2.1</td><td><span class="badge badge-info">maintain_lane</span></td><td class="mono">0.82</td><td class="mono">—</td></tr>
+              <tr><td class="mono">agent_02</td><td>pedestrian</td><td class="mono">8.7, -2.5</td><td><span class="badge badge-fault">will_cross</span></td><td class="mono">0.91</td><td class="mono" style="color:var(--fault);">2.4s</td></tr>
+              <tr><td class="mono">agent_03</td><td>vehicle</td><td class="mono">-15.2, 4.8</td><td><span class="badge badge-warn">lane_change_right</span></td><td class="mono">0.67</td><td class="mono">—</td></tr>
+              <tr><td class="mono">agent_04</td><td>cyclist</td><td class="mono">5.3, 6.2</td><td><span class="badge badge-active">will_yield</span></td><td class="mono">0.74</td><td class="mono">—</td></tr>
+              <tr><td class="mono">agent_05</td><td>vehicle</td><td class="mono">22.1, -3.4</td><td><span class="badge badge-warn">stopping</span></td><td class="mono">0.88</td><td class="mono">—</td></tr>
+              <tr><td class="mono">agent_06</td><td>pedestrian</td><td class="mono">-3.2, 8.4</td><td><span class="badge badge-info">starting</span></td><td class="mono">0.55</td><td class="mono">—</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="grid-2 mb-4">
+        <div class="card">
+          <div class="card-header"><div class="card-title">🛣 Trajectory hypotheses (agent_02)</div></div>
+          <div class="card-body text-sm">
+            <div class="mb-2"><span class="badge badge-active">primary</span> <span class="mono">p=0.62</span> — cross at +2.5m Y</div>
+            <div class="mb-2"><span class="badge badge-warn">alt 1</span> <span class="mono">p=0.22</span> — pause at curb</div>
+            <div class="mb-2"><span class="badge badge-info">alt 2</span> <span class="mono">p=0.16</span> — reverse direction</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">🌫 Occlusion regions</div></div>
+          <div class="card-body text-sm">
+            <div class="mb-2"><span class="badge badge-muted">visible</span> forward 35m × 8m corridor</div>
+            <div class="mb-2"><span class="badge badge-fault">occluded</span> rear-left 6m × 4m (parked van)</div>
+            <div class="mb-2"><span class="badge badge-info">inferred</span> intersection right 5m × 4m (from prior sweep)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">📸 Module screenshot</div></div>
+        <img src="screenshots/prediction-module.png" alt="Prediction module" style="width:100%; display:block;">
+      </div>
+    </div>
+  </main>
+  <div id="site-footer"></div>
+  <script src="assets/data.js"></script>
+  <script src="assets/app.js"></script>
+  <script>AVops.init('prediction.html');</script>
+</body>
+</html>

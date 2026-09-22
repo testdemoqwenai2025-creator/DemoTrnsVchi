@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Health metrics, anomaly alerts, and maintenance schedule.">
+  <title>Diagnostics Hub · AV/Robotics Ops Center</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to content</a>
+  <div id="site-header"></div>
+  <div id="mobile-nav-host"></div>
+  <main id="main">
+    <div class="container">
+      <div class="page-header">
+        <h1>Diagnostics Hub</h1>
+        <p>Severity-sorted alerts, fleet-health radar, and maintenance schedule.</p>
+      </div>
+      <div class="grid-2 mb-4" style="grid-template-columns: 2fr 1fr;">
+        <div class="card">
+          <div class="card-header"><div class="card-title">🚨 Active alerts (<span id="alert-count">0</span> unack)</div></div>
+          <div class="card-body" id="alert-list"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">📊 Fleet health</div></div>
+          <div class="card-body text-sm" id="health-list"></div>
+        </div>
+      </div>
+      <div class="card mb-4">
+        <div class="card-header"><div class="card-title">🔧 Maintenance schedule</div></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Task</th><th>Asset</th><th>Due (km)</th><th>Status</th></tr></thead>
+            <tbody id="maint-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">📸 Module screenshot</div></div>
+        <img src="screenshots/diagnostics-module.png" alt="Diagnostics module" style="width:100%; display:block;">
+      </div>
+    </div>
+  </main>
+  <div id="site-footer"></div>
+  <script src="assets/data.js"></script>
+  <script src="assets/app.js"></script>
+  <script>
+    AVops.init('diagnostics.html');
+    const SEV_TONE = { critical: 'fault', warning: 'warn', info: 'info' };
+    const SEV_ORDER = { critical: 0, warning: 1, info: 2 };
+    const sorted = [...MockData.alerts].sort((a, b) => SEV_ORDER[a.severity] - SEV_ORDER[b.severity]);
+    document.getElementById('alert-count').textContent = MockData.alerts.filter(a => !a.acked).length;
+    const list = document.getElementById('alert-list');
+    sorted.forEach(a => {
+      const div = AVops.el('div', { style: 'display:flex; gap:8px; padding:8px; border:1px solid var(--border); border-radius:6px; margin-bottom:8px; font-size:12px;' + (a.acked ? 'opacity:0.5;' : '') });
+      div.appendChild(AVops.el('span', { class: 'badge badge-' + SEV_TONE[a.severity] }, a.severity));
+      const body = AVops.el('div', { style: 'flex:1;' });
+      body.appendChild(AVops.el('div', {}, '<span class="mono" style="font-weight:600;">' + a.code + '</span> <span class="text-muted">· asset ' + a.assetId + '</span>'));
+      body.appendChild(AVops.el('div', { class: 'text-muted text-xs' }, a.message));
+      div.appendChild(body);
+      list.appendChild(div);
+    });
+
+    const health = { battery: 53, drivetrain: 78, sensors: 88, compute: 82, comms: 91, structural: 94 };
+    const hl = document.getElementById('health-list');
+    Object.entries(health).forEach(([k, v]) => {
+      const row = AVops.el('div', { style: 'margin-bottom:8px;' });
+      row.appendChild(AVops.el('div', { style: 'display:flex; justify-content:space-between; font-size:11px; margin-bottom:4px;' }, [AVops.el('span', { class: 'text-muted' }, k), AVops.el('span', { class: 'mono', style: 'color:' + (v < 60 ? 'var(--warn)' : 'var(--accent)') + ';' }, v)]));
+      row.appendChild(AVops.el('div', { style: 'height:4px; background:var(--panel-2); border-radius:2px; overflow:hidden;' }, AVops.el('div', { style: 'height:100%; width:' + v + '%; background:' + (v < 60 ? 'var(--warn)' : 'var(--accent)') + ';' })));
+      hl.appendChild(row);
+    });
+
+    const MAINT_TONE = { due: 'warn', scheduled: 'info', overdue: 'fault', done: 'active' };
+    const mt = document.getElementById('maint-tbody');
+    MockData.maintenance.forEach(m => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = '<td>' + m.task + '</td><td class="mono">' + m.assetId + '</td><td class="mono">' + m.dueKm + '</td><td><span class="badge badge-' + MAINT_TONE[m.status] + '">' + m.status + '</span></td>';
+      mt.appendChild(tr);
+    });
+  </script>
+</body>
+</html>

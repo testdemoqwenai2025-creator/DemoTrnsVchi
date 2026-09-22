@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="V2V mesh, V2I traffic light, decentralized fleet consensus, HSM crypto verification.">
+  <title>V2X &amp; Multi-Agent · AV/Robotics Ops Center</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to content</a>
+  <div id="site-header"></div>
+  <div id="mobile-nav-host"></div>
+  <main id="main">
+    <div class="container">
+      <div class="page-header">
+        <h1>V2X Communication &amp; Multi-Agent Coordination</h1>
+        <p>Vehicle-to-Vehicle cooperative awareness, Vehicle-to-Infrastructure traffic-light ingestion, decentralized fleet consensus, and HSM-backed cryptographic message verification.</p>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header"><div class="card-title">📡 V2V mesh — <span id="peer-count">0</span> peers</div></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Peer</th><th>Position (m)</th><th>Velocity</th><th>Heading</th><th>Intent</th><th>RSSI</th></tr></thead>
+            <tbody id="peer-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="grid-2 mb-4">
+        <div class="card">
+          <div class="card-header"><div class="card-title">🚦 V2I traffic light</div></div>
+          <div class="card-body text-sm">
+            <div class="mb-2"><span class="text-muted">Light ID:</span> <span class="mono">tl_north_03</span></div>
+            <div class="mb-2"><span class="text-muted">Phase:</span> <span class="badge badge-active">● green</span></div>
+            <div class="mb-2"><span class="text-muted">Time to change:</span> <span class="mono">8s</span></div>
+            <div><span class="text-muted">Approach speed:</span> <span class="mono" style="color:var(--accent);">42 kph</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">🗳 Fleet consensus</div></div>
+          <div class="card-body text-sm">
+            <div class="mb-2"><span class="text-muted">Proposal:</span> <span class="mono">prop_0042</span></div>
+            <div class="mb-2"><span class="text-muted">Action:</span> zipper_merge</div>
+            <div class="mb-2"><span style="color:var(--accent);">For: 5</span> · <span style="color:var(--fault);">Against: 1</span></div>
+            <div style="height:6px; background:var(--panel-2); border-radius:3px; overflow:hidden;"><div style="height:100%; width:83%; background:var(--accent);"></div></div>
+            <div class="text-xs text-muted mt-2">quorum 5 · <span class="badge badge-muted">pending</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header"><div class="card-title">🛡 Crypto verification log (HSM-backed)</div></div>
+        <div class="card-body text-xs" id="crypto-log"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">📸 Module screenshot</div></div>
+        <img src="screenshots/v2x-module.png" alt="V2X module" style="width:100%; display:block;">
+      </div>
+    </div>
+  </main>
+  <div id="site-footer"></div>
+  <script src="assets/data.js"></script>
+  <script src="assets/app.js"></script>
+  <script>
+    AVops.init('v2x.html');
+    const tbody = document.getElementById('peer-tbody');
+    MockData.v2x.peers.forEach(p => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = '<td class="mono">' + p.id + '</td><td class="mono">' + p.x + ', ' + p.y + '</td><td class="mono">' + p.vel.toFixed(1) + ' m/s</td><td class="mono">' + p.heading + '°</td><td><span class="badge badge-info">' + p.intent + '</span></td><td class="mono" style="color:' + (p.rssi < -75 ? 'var(--warn)' : 'var(--fg)') + ';">' + p.rssi + ' dBm</td>';
+      tbody.appendChild(tr);
+    });
+    document.getElementById('peer-count').textContent = MockData.v2x.peers.length;
+
+    const log = document.getElementById('crypto-log');
+    MockData.v2x.crypto.forEach(e => {
+      const tone = e.sig === 'valid' ? 'active' : e.sig === 'revoked' ? 'fault' : 'muted';
+      log.appendChild(AVops.el('div', { class: 'mb-2', style: 'display:flex; gap:8px; align-items:center;' }, [
+        AVops.el('span', { class: 'mono text-muted', style: 'font-size:10px; min-width:32px;' }, e.ts + 's'),
+        AVops.el('span', { class: 'mono', style: 'min-width:60px;' }, e.peer),
+        AVops.el('span', { class: 'badge badge-' + tone }, e.sig),
+        AVops.el('span', { class: 'badge badge-' + (e.hsm ? 'active' : 'muted') }, 'HSM ' + (e.hsm ? '✓' : '✗')),
+      ]));
+    });
+  </script>
+</body>
+</html>

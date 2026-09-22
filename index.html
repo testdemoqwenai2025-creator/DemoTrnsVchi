@@ -1,432 +1,82 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="AV/Robotics Operations Center — compartmentalized operations console for autonomous vehicles and robotics fleets. Public preview." />
-  <title>AV / Robotics Operations Center — Public Preview</title>
-  <style>
-    :root {
-      --bg: #0a0e0d;
-      --panel: #11161a;
-      --panel-2: #161b1f;
-      --border: rgba(255,255,255,0.08);
-      --fg: #e8eef0;
-      --muted: #8a9498;
-      --accent: #10b981;
-      --warn: #f59e0b;
-      --fault: #ef4444;
-      --info: #38bdf8;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif;
-      background: var(--bg);
-      background-image:
-        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
-      background-size: 32px 32px;
-      color: var(--fg);
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-    }
-    .container { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
-    header.hero {
-      border-bottom: 1px solid var(--border);
-      padding: 56px 0 40px;
-      background: radial-gradient(ellipse at top, rgba(16,185,129,0.08), transparent 60%);
-    }
-    .eyebrow {
-      display: inline-flex; align-items: center; gap: 8px;
-      font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
-      color: var(--accent);
-      background: rgba(16,185,129,0.08);
-      padding: 5px 10px; border-radius: 999px;
-      border: 1px solid rgba(16,185,129,0.25);
-    }
-    .eyebrow::before {
-      content: ""; width: 6px; height: 6px; border-radius: 50%;
-      background: var(--accent); animation: pulse 1.6s ease-in-out infinite;
-    }
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
-    h1 {
-      font-size: clamp(28px, 4vw, 44px);
-      font-weight: 700; letter-spacing: -0.02em;
-      margin: 20px 0 12px; line-height: 1.1;
-    }
-    .lede { font-size: 17px; color: var(--muted); max-width: 720px; margin: 0 0 24px; }
-    .hero-meta { display: flex; flex-wrap: wrap; gap: 12px; font-size: 13px; color: var(--muted); }
-    .hero-meta span { display: inline-flex; align-items: center; gap: 6px; }
-    .hero-meta code {
-      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-      background: var(--panel); padding: 2px 6px; border-radius: 4px; color: var(--fg);
-    }
-    main { padding: 48px 0 64px; }
-    .section { margin-bottom: 56px; }
-    .section h2 {
-      font-size: 22px; font-weight: 600; margin: 0 0 8px; letter-spacing: -0.01em;
-    }
-    .section p { color: var(--muted); margin: 0 0 20px; max-width: 720px; }
-    .stats {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 12px; margin: 24px 0 8px;
-    }
-    .stat {
-      background: var(--panel); border: 1px solid var(--border);
-      padding: 16px 18px; border-radius: 10px;
-    }
-    .stat .label {
-      font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
-      color: var(--muted); margin-bottom: 6px;
-    }
-    .stat .value { font-size: 28px; font-weight: 600; letter-spacing: -0.02em; }
-    .stat .sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
-    .stat.active .value { color: var(--accent); }
-    .stat.warn .value { color: var(--warn); }
-    .modules {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 20px;
-    }
-    .module {
-      background: var(--panel); border: 1px solid var(--border);
-      border-radius: 12px; overflow: hidden;
-      transition: transform 0.15s ease, border-color 0.15s ease;
-    }
-    .module:hover { transform: translateY(-2px); border-color: rgba(16,185,129,0.4); }
-    .module-img {
-      width: 100%; aspect-ratio: 16 / 10; object-fit: cover;
-      border-bottom: 1px solid var(--border); background: var(--panel-2);
-      display: block;
-    }
-    .module-body { padding: 16px 18px 18px; }
-    .module-tag {
-      display: inline-block; font-size: 10px; letter-spacing: 0.1em;
-      text-transform: uppercase; color: var(--accent); margin-bottom: 6px;
-    }
-    .module-body h3 { margin: 0 0 6px; font-size: 15px; font-weight: 600; }
-    .module-body p { margin: 0; font-size: 13px; color: var(--muted); }
-    .stack {
-      display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px;
-    }
-    .chip {
-      font-size: 12px; padding: 4px 10px; border-radius: 6px;
-      background: var(--panel); border: 1px solid var(--border);
-      color: var(--muted); font-family: ui-monospace, monospace;
-    }
-    .callout {
-      margin: 32px 0; padding: 18px 20px;
-      background: linear-gradient(135deg, rgba(16,185,129,0.06), rgba(56,189,248,0.04));
-      border: 1px solid rgba(16,185,129,0.2); border-radius: 12px;
-    }
-    .callout strong { color: var(--accent); }
-    footer {
-      border-top: 1px solid var(--border);
-      padding: 24px 0; margin-top: 40px;
-      font-size: 12px; color: var(--muted);
-      display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between;
-    }
-    footer a { color: var(--accent); text-decoration: none; }
-    footer a:hover { text-decoration: underline; }
-    .private-note {
-      font-size: 11px; color: var(--muted); margin-top: 8px;
-      padding: 8px 12px; background: var(--panel); border-radius: 6px;
-      border-left: 2px solid var(--warn);
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Compartmentalized multi-page operations console for autonomous vehicles and robotics fleets. 19 routes across 6 operational modules, 8 deep AV subsystems, and 5 cross-cutting pages.">
+  <title>AV/Robotics Operations Center</title>
+  <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
-  <header class="hero">
+  <a href="#main" class="skip-link">Skip to content</a>
+  <div id="site-header"></div>
+  <div id="mobile-nav-host"></div>
+
+  <main id="main">
     <div class="container">
-      <span class="eyebrow">System nominal · v0.9.0</span>
-      <h1>Autonomous Vehicles &amp; Robotics<br/>Operations Center</h1>
-      <p class="lede">
-        A compartmentalized operations console for monitoring, commanding, and reasoning about
-        autonomous-vehicle and robotics fleets — fleet overview, live telemetry at 5 Hz,
-        mission control, joint-level robotics console, diagnostics, and an in-app knowledge vault.
-      </p>
-      <div class="hero-meta">
-        <span>📡 <code>20 assets</code></span>
-        <span>🟢 <code>18 online</code></span>
-        <span>⚠️ <code>2 active alerts</code></span>
-        <span>⏱️ <code>telemetry @ 5 Hz</code></span>
-        <span>🌐 <code>19 routes · MPA</code></span>
-        <span>🧠 <code>14 module compartments</code></span>
-        <span>🔒 <code>NDA-free preview</code></span>
-      </div>
-      <div class="private-note">
-        This public page is a preview only. Source code, type contracts, architecture files,
-        and worklogs live in the private repo
-        <a href="https://github.com/testdemoqwenai2025-creator/RoboTrnsVchi" target="_blank" rel="noopener">
-          <code>RoboTrnsVchi</code>
-        </a>.
-      </div>
-    </div>
-  </header>
-
-  <main>
-    <div class="container">
-      <section class="section">
-        <h2>Compartmentalized by design</h2>
-        <p>
-          Every concern lives in exactly one compartment. Compartments communicate only through
-          declared interfaces (typed stores, API routes, event emitters). This keeps the system
-          testable, replaceable, and reviewable in isolation — and it means a real backend can
-          be slotted in by replacing a single file.
-        </p>
-        <div class="stats">
-          <div class="stat active">
-            <div class="label">Assets tracked</div>
-            <div class="value">20</div>
-            <div class="sub">12 vehicles · 8 robots</div>
-          </div>
-          <div class="stat">
-            <div class="label">Compartments</div>
-            <div class="value">9</div>
-            <div class="sub">3 foundation · 6 modules</div>
-          </div>
-          <div class="stat warn">
-            <div class="label">Sensor streams</div>
-            <div class="value">7</div>
-            <div class="sub">per asset · 5 Hz</div>
-          </div>
-          <div class="stat">
-            <div class="label">Knowledge entries</div>
-            <div class="value">12</div>
-            <div class="sub">cross-linked</div>
-          </div>
+      <section class="hero">
+        <span class="hero-eyebrow">System nominal · v0.10.0 · 19 routes · MPA</span>
+        <h1>Autonomous Vehicles &amp; Robotics<br>Operations Center</h1>
+        <p>A compartmentalized multi-page application for monitoring, commanding, and reasoning about autonomous-vehicle and robotics fleets. Every module is its own route — bookmarkable, refresh-safe, shareable. This is a real static MPA: 19 separate HTML pages, not a single landing page.</p>
+        <div class="hero-meta">
+          <span>📡 <code>20 assets</code></span>
+          <span>🟢 <code>2 online</code></span>
+          <span>⚠️ <code>4 faults</code></span>
+          <span>⏱️ <code>telemetry @ 5 Hz</code></span>
+          <span>🌐 <code>19 routes</code></span>
+          <span>🧠 <code>14 module compartments</code></span>
+          <span>🔒 <code>NDA-free preview</code></span>
         </div>
       </section>
 
-      <section class="section">
-        <h2>Module screenshots</h2>
-        <p>
-          Each module is a self-contained compartment. Click through the live application to see
-          real-time telemetry, mission CRUD, joint nudge + animated schematic, alert acknowledgement,
-          and cross-module asset selection.
-        </p>
-        <div class="modules">
-          <article class="module">
-            <img class="module-img" src="screenshots/fleet-module.png" alt="Fleet Overview module" loading="lazy" />
-            <div class="module-body">
-              <span class="module-tag">M1 · Fleet</span>
-              <h3>Fleet Overview</h3>
-              <p>KPI cards, filterable registry of every AV and robot, status breakdown donut.</p>
-            </div>
-          </article>
-          <article class="module">
-            <img class="module-img" src="screenshots/telemetry-module.png" alt="Live Telemetry module" loading="lazy" />
-            <div class="module-body">
-              <span class="module-tag">M2 · Telemetry</span>
-              <h3>Live Telemetry</h3>
-              <p>5 Hz sensor stream across 7 sensor kinds, with threshold-based warn/fault coloring.</p>
-            </div>
-          </article>
-          <article class="module">
-            <img class="module-img" src="screenshots/missions-module.png" alt="Mission Control module" loading="lazy" />
-            <div class="module-body">
-              <span class="module-tag">M3 · Missions</span>
-              <h3>Mission Control</h3>
-              <p>Kanban board with create / start / complete / cancel and waypoint detail.</p>
-            </div>
-          </article>
-          <article class="module">
-            <img class="module-img" src="screenshots/robotics-module.png" alt="Robotics Console module" loading="lazy" />
-            <div class="module-body">
-              <span class="module-tag">M4 · Robotics</span>
-              <h3>Robotics Console</h3>
-              <p>Joint table with nudge controls, gripper state, animated 7-DoF SVG schematic.</p>
-            </div>
-          </article>
-          <article class="module">
-            <img class="module-img" src="screenshots/diagnostics-module.png" alt="Diagnostics Hub module" loading="lazy" />
-            <div class="module-body">
-              <span class="module-tag">M5 · Diagnostics</span>
-              <h3>Diagnostics Hub</h3>
-              <p>Severity-sorted alerts, fleet-health radar, maintenance schedule with completion.</p>
-            </div>
-          </article>
-          <article class="module">
-            <img class="module-img" src="screenshots/knowledge-module.png" alt="Knowledge Vault module" loading="lazy" />
-            <div class="module-body">
-              <span class="module-tag">M6 · Knowledge</span>
-              <h3>Knowledge Vault</h3>
-              <p>Searchable AV/Robotics encyclopedia with related-code / asset-class cross-navigation.</p>
-            </div>
-          </article>
+      <section>
+        <h2>Operational modules (M1–M6, Phase 1)</h2>
+        <p>The management layer — registry, telemetry, missions, robotics console, diagnostics, and the knowledge vault.</p>
+        <div class="grid-3">
+          <a class="module-card" href="fleet.html"><img class="module-card-img" src="screenshots/fleet-module.png" alt="Fleet Overview"><div class="module-card-body"><span class="module-card-tag">M1 · Fleet</span><h3>Fleet Overview</h3><p>KPI cards, filterable registry, status donut.</p></div></a>
+          <a class="module-card" href="telemetry.html"><img class="module-card-img" src="screenshots/telemetry-module.png" alt="Live Telemetry"><div class="module-card-body"><span class="module-card-tag">M2 · Telemetry</span><h3>Live Telemetry</h3><p>5 Hz sensor streams with threshold coloring.</p></div></a>
+          <a class="module-card" href="missions.html"><img class="module-card-img" src="screenshots/missions-module.png" alt="Mission Control"><div class="module-card-body"><span class="module-card-tag">M3 · Missions</span><h3>Mission Control</h3><p>Kanban board with create/start/cancel.</p></div></a>
+          <a class="module-card" href="robotics.html"><img class="module-card-img" src="screenshots/robotics-module.png" alt="Robotics Console"><div class="module-card-body"><span class="module-card-tag">M4 · Robotics</span><h3>Robotics Console</h3><p>Joint state, gripper, animated SVG schematic.</p></div></a>
+          <a class="module-card" href="diagnostics.html"><img class="module-card-img" src="screenshots/diagnostics-module.png" alt="Diagnostics Hub"><div class="module-card-body"><span class="module-card-tag">M5 · Diagnostics</span><h3>Diagnostics Hub</h3><p>Alerts, fleet-health radar, maintenance.</p></div></a>
+          <a class="module-card" href="knowledge.html"><img class="module-card-img" src="screenshots/knowledge-module.png" alt="Knowledge Vault"><div class="module-card-body"><span class="module-card-tag">M6 · Knowledge</span><h3>Knowledge Vault</h3><p>Searchable AV/Robotics encyclopedia.</p></div></a>
         </div>
       </section>
 
-      <section class="section">
-        <h2>Deep AV subsystems <span style="font-size:11px; padding:2px 8px; border-radius:999px; background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3); color:#10b981; vertical-align:middle; margin-left:8px;">Phase 3</span></h2>
-        <p>
-          Phase 3 added eight deep AV subsystem panels on top of the operational layer — perception
-          fusion, SLAM, prediction, behavioural planning, trajectory/MPC, V2X, fault tolerance, and
-          simulation/HIL. Each is its own route, mock-driven, and consistent with the
-          compartmentalized architecture.
-        </p>
-        <div class="modules">
-          <article class="module">
-            <img class="module-img" src="screenshots/perception-module.png" alt="Perception &amp; Sensor Fusion" loading="lazy" />
-            <div class="module-body">
-              <span class="module-tag">M7 · Perception</span>
-              <h3>Sensor Fusion</h3>
-              <p>LiDAR/RADAR/RGB-D/Ultrasonic sync, 3D object detection with EKF/UKF, semantic segmentation, weather filtering.</p>
-            </div>
-          </article>
-          <article class="module">
-            <img class="module-img" src="screenshots/localization-module.png" alt="Localization &amp; SLAM" loading="lazy" />
-            <div class="module-body">
-              <span class="module-tag">M8 · Localization</span>
-              <h3>SLAM &amp; HD Maps</h3>
-              <p>HD map SVG with ego pose, SLAM-vs-GNSS divergence, RTK precision, visual-odometer backup.</p>
-            </div>
-          </article>
-          <article class="module">
-            <img class="module-img" src="screenshots/prediction-module.png" alt="Prediction &amp; Intent" loading="lazy" />
-            <div class="module-body">
-              <span class="module-tag">M9 · Prediction</span>
-              <h3>Intent &amp; Forecast</h3>
-              <p>Pedestrian intent, multi-hypothesis trajectory cones, occlusion map, scene graph.</p>
-            </div>
-          </article>
-          <article class="module">
-            <img class="module-img" src="screenshots/planning-module.png" alt="Behavioural Planning" loading="lazy" />
-            <div class="module-body">
-              <span class="module-tag">M10 · Planning</span>
-              <h3>Behavioural Planner</h3>
-              <p>Decision state machine, arbitration tree across safety/legality/comfort/progress.</p>
-            </div>
-          </article>
-          <article class="module">
-            <img class="module-img" src="screenshots/trajectory-module.png" alt="Trajectory &amp; Motion Control" loading="lazy" />
-            <div class="module-body">
-              <span class="module-tag">M11 · Trajectory</span>
-              <h3>MPC &amp; Motion Control</h3>
-              <p>4D quintic trajectory, MPC solver status, PID vs Pure Pursuit comparison, Smith predictor.</p>
-            </div>
-          </article>
-          <article class="module">
-            <img class="module-img" src="screenshots/v2x-module.png" alt="V2X &amp; Multi-Agent" loading="lazy" />
-            <div class="module-body">
-              <span class="module-tag">M12 · V2X</span>
-              <h3>V2X &amp; Multi-Agent</h3>
-              <p>V2V mesh, V2I traffic light, decentralized fleet consensus, HSM crypto verification.</p>
-            </div>
-          </article>
-          <article class="module">
-            <img class="module-img" src="screenshots/safety-module.png" alt="Fault Tolerance &amp; Fail-Safe" loading="lazy" />
-            <div class="module-body">
-              <span class="module-tag">M13 · Safety</span>
-              <h3>Fault Tolerance</h3>
-              <p>Fail-safe FSM, primary/secondary redundancy, watchdog timers, ISO 26262 ASIL.</p>
-            </div>
-          </article>
-          <article class="module">
-            <img class="module-img" src="screenshots/simulation-module.png" alt="Simulation / CI-CD / HIL" loading="lazy" />
-            <div class="module-body">
-              <span class="module-tag">M14 · Simulation</span>
-              <h3>Sim / CI-CD / HIL</h3>
-              <p>Scenario runs, CI/CD pipeline stages, HIL bench status, scenario pass-rate library.</p>
-            </div>
-          </article>
+      <section>
+        <h2>Deep AV subsystems (M7–M14, Phase 3) <span class="badge badge-active">Phase 3</span></h2>
+        <p>Eight deep AV-subsystem panels on top of the operational layer — perception fusion, SLAM, prediction, behavioural planning, trajectory/MPC, V2X, fault tolerance, and simulation/HIL.</p>
+        <div class="grid-4">
+          <a class="module-card" href="perception.html"><img class="module-card-img" src="screenshots/perception-module.png" alt="Perception"><div class="module-card-body"><span class="module-card-tag">M7</span><h3>Perception</h3><p>LiDAR/RADAR/RGB-D/Ultrasonic fusion.</p></div></a>
+          <a class="module-card" href="localization.html"><img class="module-card-img" src="screenshots/localization-module.png" alt="Localization"><div class="module-card-body"><span class="module-card-tag">M8</span><h3>Localization</h3><p>HD maps, SLAM, RTK-GNSS/IMU.</p></div></a>
+          <a class="module-card" href="prediction.html"><img class="module-card-img" src="screenshots/prediction-module.png" alt="Prediction"><div class="module-card-body"><span class="module-card-tag">M9</span><h3>Prediction</h3><p>Pedestrian intent, trajectory cones.</p></div></a>
+          <a class="module-card" href="planning.html"><img class="module-card-img" src="screenshots/planning-module.png" alt="Planning"><div class="module-card-body"><span class="module-card-tag">M10</span><h3>Planning</h3><p>Behaviour FSM, arbitration tree.</p></div></a>
+          <a class="module-card" href="trajectory.html"><img class="module-card-img" src="screenshots/trajectory-module.png" alt="Trajectory"><div class="module-card-body"><span class="module-card-tag">M11</span><h3>Trajectory</h3><p>4D quintic, MPC, Smith predictor.</p></div></a>
+          <a class="module-card" href="v2x.html"><img class="module-card-img" src="screenshots/v2x-module.png" alt="V2X"><div class="module-card-body"><span class="module-card-tag">M12</span><h3>V2X</h3><p>V2V mesh, V2I, HSM crypto.</p></div></a>
+          <a class="module-card" href="safety.html"><img class="module-card-img" src="screenshots/safety-module.png" alt="Safety"><div class="module-card-body"><span class="module-card-tag">M13</span><h3>Safety</h3><p>Fail-safe FSM, redundancy, ASIL.</p></div></a>
+          <a class="module-card" href="simulation.html"><img class="module-card-img" src="screenshots/simulation-module.png" alt="Simulation"><div class="module-card-body"><span class="module-card-tag">M14</span><h3>Simulation</h3><p>CI/CD pipeline, HIL bench.</p></div></a>
         </div>
       </section>
 
-      <section class="section">
-        <h2>Cross-cutting pages</h2>
-        <p>
-          Phase 2 added four pages that cut across every module: a demo login with auto-filled
-          credentials, cross-module search, a theme-scoped AI assistant, and a full GDPR privacy
-          notice. The application is now a proper Multi-Page Application — every module is its
-          own URL, bookmarkable and refresh-safe.
-        </p>
-        <div class="modules">
-          <article class="module">
-            <img class="module-img" src="screenshots/home-page.png" alt="Landing page" loading="lazy" />
-            <div class="module-body">
-              <span class="module-tag">Landing</span>
-              <h3>Home</h3>
-              <p>Hero, compartment map, and quick links to every module.</p>
-            </div>
-          </article>
-          <article class="module">
-            <img class="module-img" src="screenshots/login-page.png" alt="Login page" loading="lazy" />
-            <div class="module-body">
-              <span class="module-tag">Auth</span>
-              <h3>Login</h3>
-              <p>Auto-fill demo credentials, mock session via localStorage.</p>
-            </div>
-          </article>
-          <article class="module">
-            <img class="module-img" src="screenshots/search-page.png" alt="Search page" loading="lazy" />
-            <div class="module-body">
-              <span class="module-tag">Search</span>
-              <h3>Cross-module search</h3>
-              <p>One box queries assets, missions, and the knowledge vault.</p>
-            </div>
-          </article>
-          <article class="module">
-            <img class="module-img" src="screenshots/chat-page.png" alt="AI chat page" loading="lazy" />
-            <div class="module-body">
-              <span class="module-tag">F4 · AI Assistant</span>
-              <h3>Theme-scoped chat</h3>
-              <p>Answers AV/Robotics questions only; links to 8 free AI platforms.</p>
-            </div>
-          </article>
-          <article class="module">
-            <img class="module-img" src="screenshots/privacy-page.png" alt="Privacy page" loading="lazy" />
-            <div class="module-body">
-              <span class="module-tag">GDPR</span>
-              <h3>Privacy notice</h3>
-              <p>Five-section GDPR notice: cookies, data, rights, legal basis, contact.</p>
-            </div>
-          </article>
-        </div>
-      </section>
-
-      <section class="section">
-        <h2>Technology</h2>
-        <p>
-          The platform is built on a modern TypeScript stack, chosen for type-safety, server-component
-          ergonomics, and a path to production deployment.
-        </p>
-        <div class="stack">
-          <span class="chip">Next.js 16</span>
-          <span class="chip">TypeScript 5</span>
-          <span class="chip">Tailwind CSS 4</span>
-          <span class="chip">shadcn/ui</span>
-          <span class="chip">Zustand</span>
-          <span class="chip">TanStack Query</span>
-          <span class="chip">Recharts</span>
-          <span class="chip">Framer Motion</span>
-          <span class="chip">Prisma (SQLite)</span>
-          <span class="chip">next-themes</span>
-          <span class="chip">Socket.io (ready)</span>
+      <section>
+        <h2>Cross-cutting pages (Phase 2)</h2>
+        <p>Login with auto-fill, cross-module search, theme-scoped AI chat, and a full GDPR privacy notice.</p>
+        <div class="grid-4">
+          <a class="module-card" href="login.html"><div class="module-card-body"><span class="module-card-tag">Auth</span><h3>Login</h3><p>Auto-fill demo credentials.</p></div></a>
+          <a class="module-card" href="search.html"><div class="module-card-body"><span class="module-card-tag">Search</span><h3>Search</h3><p>Cross-module search.</p></div></a>
+          <a class="module-card" href="chat.html"><div class="module-card-body"><span class="module-card-tag">AI</span><h3>AI Chat</h3><p>Theme-scoped assistant.</p></div></a>
+          <a class="module-card" href="privacy.html"><div class="module-card-body"><span class="module-card-tag">GDPR</span><h3>Privacy</h3><p>Full GDPR notice.</p></div></a>
         </div>
       </section>
 
       <div class="callout">
-        <strong>For investors &amp; partners.</strong> This page is the canonical NDA-free preview
-        of the platform. The full source, architecture, and design documentation are available
-        under NDA in the private repository
-        <a href="https://github.com/testdemoqwenai2025-creator/RoboTrnsVchi" target="_blank" rel="noopener">
-          <code>RoboTrnsVchi</code>
-        </a>.
-        To request access or schedule a guided demo, contact the project owner.
+        <strong>This is a real MPA.</strong> 19 separate HTML files, each with its own URL, sharing CSS and JS via <code>assets/</code>. Browser back/forward works. Pages are bookmarkable. Theme toggle persists across pages via <code>localStorage</code>. Source code, type contracts, and architecture docs live in the <a href="https://github.com/testdemoqwenai2025-creator/RoboTrnsVchi" target="_blank" rel="noopener">private repo <code>RoboTrnsVchi</code></a>.
       </div>
     </div>
   </main>
 
-  <footer>
-    <div class="container" style="display:flex; flex-wrap:wrap; gap:16px; justify-content:space-between; width:100%;">
-      <span>© AV/Robotics Operations Center · Compartmentalized build</span>
-      <span>
-        <a href="https://github.com/testdemoqwenai2025-creator/RoboTrnsVchi" target="_blank" rel="noopener">Private repo</a>
-        &nbsp;·&nbsp;
-        <a href="https://github.com/testdemoqwenai2025-creator/DemoTrnsVchi" target="_blank" rel="noopener">Public repo</a>
-      </span>
-    </div>
-  </footer>
+  <div id="site-footer"></div>
+  <script src="assets/data.js"></script>
+  <script src="assets/app.js"></script>
+  <script>AVops.init('index.html');</script>
 </body>
 </html>

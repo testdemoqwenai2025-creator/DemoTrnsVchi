@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Theme-scoped AI assistant for the AV/Robotics Operations Center. Only answers AV/Robotics questions; politely declines off-topic.">
+  <title>AI Chat · AV/Robotics Ops Center</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to content</a>
+  <div id="site-header"></div>
+  <div id="mobile-nav-host"></div>
+
+  <main id="main">
+    <div class="container">
+      <div class="page-header">
+        <h1>AI Assistant</h1>
+        <p>Ask questions about the AV/Robotics platform — sensors, missions, diagnostics, knowledge entries, control theory. The assistant is scoped to the AV/Robotics domain; off-topic questions are politely declined.</p>
+      </div>
+
+      <div style="display:grid; grid-template-columns: 2fr 1fr; gap:16px;">
+        <div class="chat-window">
+          <div class="chat-header">✨ AV/Robotics Assistant <span class="badge badge-active" style="margin-left:auto;">Scoped</span></div>
+          <div class="chat-messages" id="chat-messages" role="log" aria-live="polite" aria-label="Chat conversation"></div>
+          <form class="chat-form" id="chat-form">
+            <input class="chat-input" id="chat-input" type="text" placeholder="Ask about LIDAR_DRIFT, IMU saturation, MPC vs PID…" aria-label="Chat message">
+            <button type="submit" class="btn btn-primary">Send</button>
+          </form>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:16px;">
+          <div class="card">
+            <div class="card-header"><div class="card-title">💡 Try these prompts</div></div>
+            <div class="card-body" style="font-size:11px; color:var(--muted);">
+              <div class="mono mb-2" style="background:var(--panel-2); padding:6px 8px; border-radius:4px;">What is LIDAR_DRIFT?</div>
+              <div class="mono mb-2" style="background:var(--panel-2); padding:6px 8px; border-radius:4px;">Explain battery DoD limits.</div>
+              <div class="mono mb-2" style="background:var(--panel-2); padding:6px 8px; border-radius:4px;">How does MPC compare to PID?</div>
+              <div class="mono mb-2" style="background:var(--panel-2); padding:6px 8px; border-radius:4px;">What does GPS_DROP mean?</div>
+              <div class="mono" style="background:var(--panel-2); padding:6px 8px; border-radius:4px;">Why is joint 3 hot?</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><div class="card-title">🛡 Scope policy</div></div>
+            <div class="card-body text-xs text-muted">Only answers AV/Robotics domain questions. Off-topic politely declined and redirected. Rule-based responder — no external API, no keys.</div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><div class="card-title">🔗 Free AI platforms</div></div>
+            <div class="card-body text-xs">
+              <div class="text-muted mb-2">Want a generative answer? Open a free AI platform:</div>
+              <div style="display:flex; flex-direction:column; gap:6px;">
+                <a class="btn" href="https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat" target="_blank" rel="noopener">DuckDuckGo AI Chat ↗</a>
+                <a class="btn" href="https://huggingface.co/chat" target="_blank" rel="noopener">HuggingChat ↗</a>
+                <a class="btn" href="https://www.perplexity.ai" target="_blank" rel="noopener">Perplexity ↗</a>
+                <a class="btn" href="https://you.com" target="_blank" rel="noopener">You.com ↗</a>
+                <a class="btn" href="https://www.phind.com" target="_blank" rel="noopener">Phind ↗</a>
+                <a class="btn" href="https://chat.openai.com" target="_blank" rel="noopener">ChatGPT (free) ↗</a>
+                <a class="btn" href="https://gemini.google.com/app" target="_blank" rel="noopener">Gemini (free) ↗</a>
+                <a class="btn" href="https://copilot.microsoft.com" target="_blank" rel="noopener">Copilot ↗</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+  <script src="assets/data.js"></script>
+  <script src="assets/app.js"></script>
+  <script>AVops.init('chat.html');</script>
+</body>
+</html>

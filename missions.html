@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Kanban board of queued, active, completed, and cancelled missions.">
+  <title>Mission Control · AV/Robotics Ops Center</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to content</a>
+  <div id="site-header"></div>
+  <div id="mobile-nav-host"></div>
+  <main id="main">
+    <div class="container">
+      <div class="page-header">
+        <h1>Mission Control</h1>
+        <p>Task assignment and route status. Create new missions, start or cancel active ones, and inspect waypoint progress.</p>
+      </div>
+      <div class="grid-4" id="board"></div>
+      <div class="card mt-4">
+        <div class="card-header"><div class="card-title">📸 Module screenshot</div></div>
+        <img src="screenshots/missions-module.png" alt="Missions module" style="width:100%; display:block;">
+      </div>
+    </div>
+  </main>
+  <div id="site-footer"></div>
+  <script src="assets/data.js"></script>
+  <script src="assets/app.js"></script>
+  <script>
+    AVops.init('missions.html');
+    const COLUMNS = [
+      { status: 'queued', label: 'Queued', tone: 'muted' },
+      { status: 'active', label: 'Active', tone: 'active' },
+      { status: 'completed', label: 'Completed', tone: 'active' },
+      { status: 'cancelled', label: 'Cancelled', tone: 'fault' },
+    ];
+    const PRIO_TONE = { critical: 'fault', high: 'warn', normal: 'info', low: 'muted' };
+    const board = document.getElementById('board');
+    COLUMNS.forEach(col => {
+      const items = MockData.missions.filter(m => m.status === col.status);
+      const card = AVops.el('div', { class: 'card' });
+      card.appendChild(AVops.el('div', { class: 'card-header' }, AVops.el('div', { class: 'card-title' }, col.label + ' (' + items.length + ')')));
+      const body = AVops.el('div', { class: 'card-body' });
+      if (items.length === 0) {
+        body.appendChild(AVops.el('div', { class: 'text-xs text-muted text-center', style: 'padding:16px 0;' }, 'No missions'));
+      }
+      items.forEach(m => {
+        const div = AVops.el('div', { style: 'border:1px solid var(--border); border-radius:6px; padding:8px; margin-bottom:8px; font-size:12px;' });
+        div.appendChild(AVops.el('div', { style: 'display:flex; justify-content:space-between; margin-bottom:4px;' }, [
+          AVops.el('span', { class: 'mono', style: 'font-weight:600;' }, m.callsign),
+          AVops.el('span', { class: 'badge badge-' + (PRIO_TONE[m.priority] || 'muted') }, m.priority),
+        ]));
+        div.appendChild(AVops.el('div', { class: 'text-muted mb-2', style: 'font-size:11px;' }, m.payload));
+        div.appendChild(AVops.el('div', { class: 'text-xs text-muted', style: 'display:flex; justify-content:space-between;' }, [
+          AVops.el('span', {}, '→ ' + m.destination),
+          AVops.el('span', { class: 'mono' }, m.reached + '/' + m.waypoints + ' WP'),
+        ]));
+        body.appendChild(div);
+      });
+      card.appendChild(body);
+      board.appendChild(card);
+    });
+  </script>
+</body>
+</html>

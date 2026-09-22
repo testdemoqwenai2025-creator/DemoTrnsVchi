@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Real-time sensor streams for the selected asset at 5 Hz.">
+  <title>Live Telemetry · AV/Robotics Ops Center</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to content</a>
+  <div id="site-header"></div>
+  <div id="mobile-nav-host"></div>
+
+  <main id="main">
+    <div class="container">
+      <div class="page-header">
+        <h1>Live Telemetry</h1>
+        <p>Streaming sensor frames at 5 Hz. Pick an asset below to view its sensor readings.</p>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header"><div class="card-title">🎯 Select asset</div></div>
+        <div class="card-body">
+          <select id="asset-select" class="form-input"></select>
+          <div id="asset-info" class="mt-2 text-sm"></div>
+        </div>
+      </div>
+
+      <div class="grid-4" id="sensor-grid"></div>
+
+      <div class="card mt-4">
+        <div class="card-header"><div class="card-title">📸 Module screenshot</div></div>
+        <img src="screenshots/telemetry-module.png" alt="Telemetry module" style="width:100%; display:block;">
+      </div>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+  <script src="assets/data.js"></script>
+  <script src="assets/app.js"></script>
+  <script>
+    AVops.init('telemetry.html');
+    const SENSORS = [
+      { kind: 'lidar', label: 'LiDAR', unit: 'm', value: 12.4, warn: 80, fault: 95, color: 'var(--accent)' },
+      { kind: 'camera', label: 'Camera', unit: 'conf', value: 0.78, warn: 0.4, fault: 0.2, color: 'var(--warn)' },
+      { kind: 'imu', label: 'IMU', unit: 'g', value: 0.62, warn: 2.0, fault: 3.5, color: 'var(--info)' },
+      { kind: 'gps', label: 'GPS', unit: 'm err', value: 1.8, warn: 5, fault: 15, color: 'var(--muted)' },
+      { kind: 'battery', label: 'Battery', unit: '%', value: 88, warn: 25, fault: 10, color: 'var(--accent)' },
+      { kind: 'temp', label: 'Temperature', unit: '°C', value: 58, warn: 70, fault: 85, color: 'var(--fault)' },
+      { kind: 'torque', label: 'Torque', unit: 'Nm', value: 46, warn: 85, fault: 95, color: 'var(--warn)' },
+    ];
+
+    const select = document.getElementById('asset-select');
+    MockData.fleet.forEach(a => {
+      const opt = document.createElement('option');
+      opt.value = a.id;
+      opt.textContent = a.callsign + ' (' + a.id + ')';
+      select.appendChild(opt);
+    });
+
+    // Pre-select from ?asset=
+    const initial = AVops.qs('asset');
+    if (initial) select.value = initial;
+    else select.value = MockData.fleet[0].id;
+
+    function render() {
+      const asset = MockData.fleet.find(a => a.id === select.value) || MockData.fleet[0];
+      const info = document.getElementById('asset-info');
+      info.innerHTML = '<span class="badge badge-muted">' + asset.class + '</span> ' +
+        '<span class="badge badge-' + (asset.status === 'online' ? 'active' : asset.status === 'fault' ? 'fault' : 'muted') + '">' + asset.status + '</span> ' +
+        '· battery ' + asset.battery + '% · ' + (asset.speed || 0) + ' kph';
+
+      const grid = document.getElementById('sensor-grid');
+      grid.innerHTML = '';
+      SENSORS.forEach(s => {
+        const card = AVops.el('div', { class: 'card' });
+        card.appendChild(AVops.el('div', { class: 'card-header' }, AVops.el('div', { class: 'card-title' }, s.label)));
+        const body = AVops.el('div', { class: 'card-body' });
+        body.appendChild(AVops.el('div', { class: 'stat-value', style: 'color:' + s.color + ';' }, s.value.toFixed(s.kind === 'camera' ? 2 : 1) + ' <span class="text-xs text-muted">' + s.unit + '</span>'));
+        body.appendChild(AVops.el('div', { class: 'text-xs text-muted mt-2' }, 'warn ' + s.warn + ' · fault ' + s.fault));
+        card.appendChild(body);
+        grid.appendChild(card);
+      });
+
+      // Update URL
+      const u = new URL(window.location.href);
+      u.searchParams.set('asset', asset.id);
+      window.history.replaceState({}, '', u);
+    }
+    select.addEventListener('change', render);
+    render();
+  </script>
+</body>
+</html>

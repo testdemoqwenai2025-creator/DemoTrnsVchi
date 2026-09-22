@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Behaviour state machine, arbitration tree across safety/legality/comfort/progress, scene context.">
+  <title>Behavioural Planning · AV/Robotics Ops Center</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to content</a>
+  <div id="site-header"></div>
+  <div id="mobile-nav-host"></div>
+  <main id="main">
+    <div class="container">
+      <div class="page-header">
+        <h1>Behavioural Planning &amp; Decision Making</h1>
+        <p>Real-time decision state machine, arbitration tree across safety/legality/comfort/progress scores, and a scene-context card.</p>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header"><div class="card-title">🌿 Current state: <span class="badge badge-active">lane_keep</span></div></div>
+        <div class="card-body text-sm">
+          <p class="mb-2 text-muted">Behaviour state machine nodes:</p>
+          <div style="display:flex; flex-wrap:wrap; gap:8px;">
+            <span class="badge badge-active">lane_keep ← current</span>
+            <span class="badge badge-warn">lane_change_left</span>
+            <span class="badge badge-warn">lane_change_right</span>
+            <span class="badge badge-info">yield</span>
+            <span class="badge badge-fault">stop</span>
+            <span class="badge badge-warn">overtake</span>
+            <span class="badge badge-fault">emergency_brake</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2 mb-4">
+        <div class="card">
+          <div class="card-header"><div class="card-title">📋 Decision log</div></div>
+          <div class="card-body text-xs">
+            <div class="mb-2"><span class="mono text-muted">08:42:15</span> <span class="badge badge-warn">lane_change_left</span> ← merge_required</div>
+            <div class="mb-2"><span class="mono text-muted">08:41:02</span> <span class="badge badge-info">yield</span> ← pedestrian_crossing</div>
+            <div class="mb-2"><span class="mono text-muted">08:39:48</span> <span class="badge badge-active">lane_keep</span> ← merge_complete</div>
+            <div class="mb-2"><span class="mono text-muted">08:38:11</span> <span class="badge badge-fault">stop</span> ← red_light</div>
+            <div class="mb-2"><span class="mono text-muted">08:36:55</span> <span class="badge badge-warn">overtake</span> ← slow_lead</div>
+            <div><span class="mono text-muted">08:35:32</span> <span class="badge badge-active">lane_keep</span> ← overtake_complete</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">🌳 Arbitration tree</div></div>
+          <div class="card-body text-xs">
+            <div class="mb-2"><strong>lane_keep</strong> — score 87 <span class="text-muted">(safety 92, legality 95, comfort 88, progress 73)</span></div>
+            <div class="mb-2"><strong>overtake</strong> — score 71 <span class="text-muted">(safety 65, legality 80, comfort 70, progress 89)</span></div>
+            <div class="mb-2"><strong>lane_change_left</strong> — score 64 <span class="text-muted">(safety 58, legality 70, comfort 60, progress 78)</span></div>
+            <div><strong>yield</strong> — score 52 <span class="text-muted">(safety 95, legality 90, comfort 50, progress 25)</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">📍 Scene context</div></div>
+        <div class="card-body text-sm">
+          <span class="text-muted">Speed limit:</span> <span class="mono">50 kph</span> ·
+          <span class="text-muted">Road:</span> urban ·
+          <span class="text-muted">Lanes:</span> <span class="mono">2</span> ·
+          <span class="text-muted">Weather:</span> clear
+        </div>
+      </div>
+
+      <div class="card mt-4">
+        <div class="card-header"><div class="card-title">📸 Module screenshot</div></div>
+        <img src="screenshots/planning-module.png" alt="Planning module" style="width:100%; display:block;">
+      </div>
+    </div>
+  </main>
+  <div id="site-footer"></div>
+  <script src="assets/data.js"></script>
+  <script src="assets/app.js"></script>
+  <script>AVops.init('planning.html');</script>
+</body>
+</html>

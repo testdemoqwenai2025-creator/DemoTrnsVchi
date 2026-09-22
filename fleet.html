@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Aggregate status of every autonomous vehicle and robot in the registry — KPIs, table, status breakdown.">
+  <title>Fleet Overview · AV/Robotics Ops Center</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to content</a>
+  <div id="site-header"></div>
+  <div id="mobile-nav-host"></div>
+
+  <main id="main">
+    <div class="container">
+      <div class="page-header">
+        <h1>Fleet Overview</h1>
+        <p>Aggregate status of every autonomous vehicle and robot in the registry. Click a row to open the asset in the Live Telemetry module.</p>
+      </div>
+
+      <div class="grid-4 mb-4" id="kpi-cards"></div>
+
+      <div class="grid-2 mb-4" style="grid-template-columns: 2fr 1fr;">
+        <div class="card">
+          <div class="card-header"><div class="card-title">📋 Registry</div></div>
+          <div class="table-wrap" style="max-height: 400px;">
+            <table>
+              <thead><tr><th>Callsign</th><th>Class</th><th>Status</th><th>Battery</th><th>Speed</th></tr></thead>
+              <tbody id="fleet-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">📊 Status breakdown</div></div>
+          <div class="card-body" id="status-breakdown"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">📸 Module screenshot</div></div>
+        <img src="screenshots/fleet-module.png" alt="Fleet Overview module" style="width:100%; display:block;">
+      </div>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+  <script src="assets/data.js"></script>
+  <script src="assets/app.js"></script>
+  <script>
+    AVops.init('fleet.html');
+    const fleet = MockData.fleet;
+    const online = fleet.filter(a => a.status === 'online').length;
+    const faults = fleet.filter(a => a.status === 'fault').length;
+    const avgBatt = Math.round(fleet.reduce((s, a) => s + a.battery, 0) / fleet.length);
+
+    const kpis = document.getElementById('kpi-cards');
+    kpis.appendChild(statCard('Total assets', fleet.length, fleet.length + ' vehicles + robots'));
+    kpis.appendChild(statCard('Online', online, Math.round(online/fleet.length*100) + '% of fleet', 'active'));
+    kpis.appendChild(statCard('Faults', faults, faults > 0 ? 'Needs attention' : 'All clear', faults > 0 ? 'warn' : ''));
+    kpis.appendChild(statCard('Avg battery', avgBatt + '%', avgBatt < 25 ? 'Low' : 'Healthy', avgBatt < 25 ? 'warn' : 'active'));
+
+    function statCard(label, value, sub, tone) {
+      const c = AVops.el('div', { class: 'stat' });
+      c.appendChild(AVops.el('div', { class: 'stat-label' }, label));
+      c.appendChild(AVops.el('div', { class: 'stat-value' + (tone === 'active' ? '' : '') }, value));
+      if (tone === 'warn') c.querySelector('.stat-value').style.color = 'var(--warn)';
+      if (tone === 'active') c.querySelector('.stat-value').style.color = 'var(--accent)';
+      c.appendChild(AVops.el('div', { class: 'stat-sub' }, sub));
+      return c;
+    }
+
+    const tbody = document.getElementById('fleet-tbody');
+    fleet.forEach(a => {
+      const tr = document.createElement('tr');
+      tr.style.cursor = 'pointer';
+      tr.addEventListener('click', () => window.location.href = 'telemetry.html?asset=' + a.id);
+      const battColor = a.battery < 10 ? 'var(--fault)' : a.battery < 25 ? 'var(--warn)' : 'var(--fg)';
+      tr.innerHTML = '<td class="mono">' + a.callsign + '<div style="font-size:10px; color:var(--muted);">' + a.id + '</div></td>' +
+        '<td><span class="badge badge-muted">' + a.class + '</span></td>' +
+        '<td><span class="badge badge-' + (a.status === 'online' ? 'active' : a.status === 'fault' ? 'fault' : a.status === 'charging' ? 'info' : 'muted') + '">' + a.status + '</span></td>' +
+        '<td class="mono" style="color:' + battColor + ';">' + a.battery + '%</td>' +
+        '<td class="mono">' + (a.speed || 0) + ' kph</td>';
+      tbody.appendChild(tr);
+    });
+
+    const counts = {};
+    fleet.forEach(a => counts[a.status] = (counts[a.status] || 0) + 1);
+    const breakdown = document.getElementById('status-breakdown');
+    Object.entries(counts).forEach(([status, count]) => {
+      const tone = status === 'online' ? 'active' : status === 'fault' ? 'fault' : status === 'charging' ? 'info' : 'muted';
+      const row = AVops.el('div', { style: 'display:flex; align-items:center; gap:8px; margin-bottom:8px;' });
+      row.appendChild(AVops.el('span', { class: 'badge badge-' + tone }, status));
+      row.appendChild(AVops.el('div', { style: 'flex:1; height:6px; background:var(--panel-2); border-radius:3px; overflow:hidden;' },
+        AVops.el('div', { style: 'height:100%; width:' + (count/fleet.length*100) + '%; background:' + (tone === 'active' ? 'var(--accent)' : tone === 'fault' ? 'var(--fault)' : tone === 'info' ? 'var(--info)' : 'var(--muted)') + ';' })));
+      row.appendChild(AVops.el('span', { class: 'mono text-xs' }, count));
+      breakdown.appendChild(row);
+    });
+  </script>
+</body>
+</html>

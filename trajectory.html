@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="4D trajectory, MPC solver, PID/Pure Pursuit comparison, actuator-delay compensation.">
+  <title>Trajectory &amp; Motion Control · AV/Robotics Ops Center</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to content</a>
+  <div id="site-header"></div>
+  <div id="mobile-nav-host"></div>
+  <main id="main">
+    <div class="container">
+      <div class="page-header">
+        <h1>Trajectory Generation &amp; Motion Control</h1>
+        <p>4D (X, Y, Z, T) trajectory via quintic polynomials, MPC for online constrained optimization, PID/Pure Pursuit as low-level fallback, and Smith predictors for actuator-delay compensation.</p>
+      </div>
+
+      <div class="grid-2 mb-4">
+        <div class="card">
+          <div class="card-header"><div class="card-title">⚙ MPC solver status</div></div>
+          <div class="card-body text-sm">
+            <div class="mb-2"><span class="text-muted">Cost (J):</span> <span class="mono">1.24</span></div>
+            <div class="mb-2"><span class="text-muted">Iterations:</span> <span class="mono">7</span></div>
+            <div class="mb-2"><span class="text-muted">Solver time:</span> <span class="mono" style="color:var(--accent);">12 ms</span></div>
+            <div class="mb-2"><span class="text-muted">Horizon:</span> <span class="mono">4 s</span></div>
+            <div><span class="text-muted">Active constraints:</span> <span class="badge badge-warn">jerk_limit</span> <span class="badge badge-warn">tyre_slip</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">📊 Controller tracking error</div></div>
+          <div class="card-body text-sm">
+            <div class="mb-2"><span class="badge badge-active">MPC</span> avg error: <span class="mono">0.08 m</span></div>
+            <div class="mb-2"><span class="badge badge-info">PID</span> avg error: <span class="mono">0.21 m</span></div>
+            <div class="mb-2"><span class="badge badge-warn">Pure Pursuit</span> avg error: <span class="mono">0.34 m</span></div>
+            <div class="text-xs text-muted mt-2">MPC tracks the trajectory most accurately by re-solving the constrained optimization at every control step.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header"><div class="card-title">🎯 Actuator delay compensation</div></div>
+        <div class="card-body text-sm">
+          <span class="text-muted">Brake latency:</span> <span class="mono">120 ms</span> ·
+          <span class="text-muted ml-4">Steering latency:</span> <span class="mono">65 ms</span> ·
+          <span class="text-muted ml-4">Smith predictor:</span> <span class="badge badge-active">active</span> ·
+          <span class="text-muted ml-4">Predicted vs actual:</span> <span class="mono" style="color:var(--accent);">0.08 m</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">📸 Module screenshot</div></div>
+        <img src="screenshots/trajectory-module.png" alt="Trajectory module" style="width:100%; display:block;">
+      </div>
+    </div>
+  </main>
+  <div id="site-footer"></div>
+  <script src="assets/data.js"></script>
+  <script src="assets/app.js"></script>
+  <script>AVops.init('trajectory.html');</script>
+</body>
+</html>

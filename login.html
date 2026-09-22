@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Demo login with auto-fill credentials for the AV/Robotics Operations Center.">
+  <title>Login · AV/Robotics Ops Center</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to content</a>
+  <div id="site-header"></div>
+  <div id="mobile-nav-host"></div>
+
+  <main id="main">
+    <div class="container" style="max-width: 480px;">
+      <div class="card">
+        <div class="card-header"><div class="card-title">🛡 Operator sign-in</div></div>
+        <div class="card-body">
+          <p class="text-sm text-muted mb-4">Demo mode — no real authentication backend.</p>
+
+          <div class="callout" style="margin: 0 0 16px;">
+            <strong>Demo credentials</strong> (click below to auto-fill):
+            <div class="mono text-xs mt-2">email: operator@av-robotics.demo<br>password: demo-avops-2026</div>
+          </div>
+
+          <form id="login-form">
+            <div class="form-group">
+              <label class="form-label" for="email">Email</label>
+              <input class="form-input" type="email" id="email" name="email" placeholder="operator@av-robotics.demo" autocomplete="email">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="password">Password</label>
+              <input class="form-input" type="password" id="password" name="password" placeholder="••••••••" autocomplete="current-password">
+            </div>
+            <div class="form-group">
+              <label class="form-checkbox"><input type="checkbox" id="remember" checked> Remember me on this device (stores session in localStorage)</label>
+            </div>
+            <div id="login-error" class="form-error hidden"></div>
+            <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">🚀 Sign in</button>
+            <button type="button" id="fill-demo" class="btn" style="width:100%; justify-content:center; margin-top:8px;">✨ Fill demo credentials</button>
+          </form>
+
+          <p class="text-xs text-muted mt-4">By signing in you agree to our <a href="privacy.html">privacy notice</a>. This is a demo — no real credentials are validated.</p>
+        </div>
+      </div>
+
+      <p class="text-center mt-4"><a href="index.html" class="text-xs">← Return to home</a></p>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+  <script src="assets/data.js"></script>
+  <script src="assets/app.js"></script>
+  <script>
+    AVops.init('login.html');
+    document.getElementById('fill-demo').addEventListener('click', () => {
+      document.getElementById('email').value = 'operator@av-robotics.demo';
+      document.getElementById('password').value = 'demo-avops-2026';
+      document.getElementById('login-error').classList.add('hidden');
+    });
+    document.getElementById('login-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const err = document.getElementById('login-error');
+      if (!email) { err.textContent = 'Email is required.'; err.classList.remove('hidden'); return; }
+      if (!password) { err.textContent = 'Password is required.'; err.classList.remove('hidden'); return; }
+      err.classList.add('hidden');
+      AVops.signIn(email);
+      // signIn reloads the page; if it didn't, redirect manually:
+      setTimeout(() => window.location.href = 'fleet.html', 100);
+    });
+  </script>
+</body>
+</html>

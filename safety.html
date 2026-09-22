@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Fail-safe state machine, primary/secondary redundancy, watchdog timers, ISO 26262 ASIL compliance.">
+  <title>Fault Tolerance &amp; Fail-Safe · AV/Robotics Ops Center</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to content</a>
+  <div id="site-header"></div>
+  <div id="mobile-nav-host"></div>
+  <main id="main">
+    <div class="container">
+      <div class="page-header">
+        <h1>Safety-Critical Fault Tolerance &amp; Fail-Safe</h1>
+        <p>Fail-safe state machine, primary/secondary redundancy for every safety-critical subsystem, watchdog timers, and ISO 26262 ASIL compliance indicators.</p>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header"><div class="card-title">🛡 Fail-safe state — <span class="badge badge-active">NOMINAL</span></div></div>
+        <div class="card-body text-sm">
+          <div class="mb-2"><span class="text-muted">States:</span></div>
+          <div style="display:flex; flex-wrap:wrap; gap:6px;">
+            <span class="badge badge-active">NOMINAL ← current</span>
+            <span class="badge badge-warn">SOFT_STOP</span>
+            <span class="badge badge-fault">HARD_STOP</span>
+            <span class="badge badge-info">SAFE_MODE</span>
+            <span class="badge badge-fault">SHUTDOWN</span>
+          </div>
+          <div class="mt-2 text-xs text-muted">Last transition: <span class="mono">08:35:12</span> · NOMINAL → NOMINAL · trigger auto_recover</div>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header"><div class="card-title">🔄 Redundancy (primary / secondary)</div></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Subsystem</th><th>Primary</th><th>Secondary</th><th>Divergence</th><th>ASIL</th></tr></thead>
+            <tbody>
+              <tr><td>perception</td><td><span class="badge badge-active">nominal</span></td><td><span class="badge badge-active">nominal</span></td><td class="mono">4%</td><td><span class="badge badge-info">B</span></td></tr>
+              <tr><td>braking</td><td><span class="badge badge-active">nominal</span></td><td><span class="badge badge-active">nominal</span></td><td class="mono">2%</td><td><span class="badge badge-fault">D</span></td></tr>
+              <tr><td>steering</td><td><span class="badge badge-active">nominal</span></td><td><span class="badge badge-warn">degraded</span></td><td class="mono">11%</td><td><span class="badge badge-fault">D</span></td></tr>
+              <tr><td>power</td><td><span class="badge badge-active">nominal</span></td><td><span class="badge badge-active">nominal</span></td><td class="mono">0%</td><td><span class="badge badge-warn">C</span></td></tr>
+              <tr><td>comms</td><td><span class="badge badge-active">nominal</span></td><td><span class="badge badge-active">nominal</span></td><td class="mono">3%</td><td><span class="badge badge-muted">A</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header"><div class="card-title">⏱ Watchdog timers</div></div>
+        <div class="card-body text-xs">
+          <div class="mb-2"><span class="badge badge-active">healthy</span> perception_heartbeat · period 100ms · last kick 32ms ago</div>
+          <div class="mb-2"><span class="badge badge-active">healthy</span> planner_heartbeat · period 50ms · last kick 18ms ago</div>
+          <div class="mb-2"><span class="badge badge-active">healthy</span> control_loop · period 20ms · last kick 6ms ago</div>
+          <div class="mb-2"><span class="badge badge-fault">expired</span> comms_heartbeat · period 1000ms · last kick 1240ms ago</div>
+          <div><span class="badge badge-active">healthy</span> safety_supervisor · period 200ms · last kick 92ms ago</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">📸 Module screenshot</div></div>
+        <img src="screenshots/safety-module.png" alt="Safety module" style="width:100%; display:block;">
+      </div>
+    </div>
+  </main>
+  <div id="site-footer"></div>
+  <script src="assets/data.js"></script>
+  <script src="assets/app.js"></script>
+  <script>AVops.init('safety.html');</script>
+</body>
+</html>
