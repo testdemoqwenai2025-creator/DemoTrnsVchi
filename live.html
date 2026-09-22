@@ -135,6 +135,20 @@
         </div>
       </div>
 
+      <!-- Phase 10c: 30/60/120 Hz stress test -->
+      <div class="card mt-4">
+        <div class="card-header"><div class="card-title">⚡ Web Worker stress test (30 / 60 / 120 Hz)</div></div>
+        <div class="card-body text-xs">
+          <p class="text-muted mb-3">Pushes the Web Worker to higher frequencies and measures main-thread frame time. If the worker works correctly, the main thread should stay responsive even at 120 Hz — no UI freeze.</p>
+          <div style="display:flex; gap:8px; margin-bottom:12px;">
+            <button class="btn" id="stress-30">⚡ 30 Hz (10s)</button>
+            <button class="btn" id="stress-60">⚡ 60 Hz (10s)</button>
+            <button class="btn" id="stress-120">⚡ 120 Hz (10s)</button>
+          </div>
+          <div id="stress-result" style="font-size:11px; font-family:ui-monospace,monospace; min-height:60px;"></div>
+        </div>
+      </div>
+
       <div class="card mt-4">
         <div class="card-header"><div class="card-title">📊 Live stats</div></div>
         <div class="card-body">
@@ -401,6 +415,48 @@
       peers.push({ id: 'peer_SPOOF', x: 0, y: 0, vx: 0, vy: 0, rssi: -10 });
       logInjection('⚠ Injected spoofed V2X node peer_SPOOF — HSM signature invalid, packet dropped');
     });
+
+    // ============ Phase 10c: Stress test (30/60/120 Hz) ============
+    const stressResult = document.getElementById('stress-result');
+    let stressWorker = null;
+
+    function runStressTest(fps) {
+      if (stressWorker) stressWorker.terminate();
+      stressResult.innerHTML = '<span style="color:var(--info);">⏳ Running ' + fps + ' Hz stress test for 10s…</span>';
+      stressWorker = new Worker('assets/stress-test-worker.js');
+
+      let frameTimes = [];
+
+      stressWorker.onmessage = (e) => {
+        const msg = e.data;
+        if (msg.type === 'stressFrame') {
+          frameTimes.push(msg.frameTimeMs);
+          stressResult.innerHTML = '<span style="color:var(--info);">⏳ ' + fps + ' Hz — frame ' + msg.frameNum + ' / ' + msg.frameTimeMs + 'ms</span>';
+        } else if (msg.type === 'stressResult') {
+          const maxFrame = Math.max(...frameTimes);
+          const avgFrame = msg.avgFrameMs;
+          const pass = avgFrame < 16.67; // 60Hz threshold
+          const tone = pass ? 'var(--accent)' : 'var(--warn)';
+          const status = pass ? '✅ PASS' : '⚠ WARN';
+          stressResult.innerHTML =
+            '<div style="color:' + tone + ';">' + status + ' — ' + fps + ' Hz stress test</div>' +
+            '<div style="color:var(--muted); margin-top:4px;">' +
+              'Frames: ' + msg.frameCount + ' in ' + (msg.durationMs/1000) + 's<br>' +
+              'Avg frame time: ' + avgFrame + 'ms<br>' +
+              'Max frame time: ' + maxFrame.toFixed(2) + 'ms<br>' +
+              'Threshold: 16.67ms (60Hz) — ' + (pass ? 'within budget' : 'exceeds budget') +
+            '</div>';
+          stressWorker.terminate();
+          stressWorker = null;
+        }
+      };
+
+      stressWorker.postMessage({ cmd: 'stressTest', fps, duration: 10000 });
+    }
+
+    document.getElementById('stress-30').addEventListener('click', () => runStressTest(30));
+    document.getElementById('stress-60').addEventListener('click', () => runStressTest(60));
+    document.getElementById('stress-120').addEventListener('click', () => runStressTest(120));
 
     // Initial render
     renderPerception();

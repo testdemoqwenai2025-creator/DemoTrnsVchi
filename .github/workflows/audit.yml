@@ -1,0 +1,51 @@
+# AV/Robotics Operations Center — CI workflow
+# Runs the static audit on every push and PR to main.
+# If any page fails (HTTP, structural, HTML leak), the build fails
+# and the push is blocked.
+
+name: Audit
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  static-audit:
+    name: Static audit (26 pages)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run static audit
+        run: |
+          # Serve the files locally and run the audit against the server
+          python3 -m http.server 8889 &
+          SERVER_PID=$!
+          sleep 2
+
+          # Run audit
+          node scripts/audit.mjs http://localhost:8889
+          EXIT_CODE=$?
+
+          # Kill server
+          kill $SERVER_PID
+
+          exit $EXIT_CODE
+
+      - name: Upload audit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: audit-report
+          path: scripts/audit-report.json
