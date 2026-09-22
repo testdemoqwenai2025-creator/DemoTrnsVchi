@@ -11,7 +11,7 @@
 //     }
 //   }
 
-self.addEventListener('message', (e) => {
+self.onmessage = (e) => {
   const { cmd, fps, duration } = e.data || {}
   if (cmd !== 'stressTest') return
 

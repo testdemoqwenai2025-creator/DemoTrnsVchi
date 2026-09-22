@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-22T13:14:33.619Z",
+  "timestamp": "2026-09-22T13:30:46.255Z",
   "baseUrl": "http://localhost:8889",
   "summary": {
     "totalPages": 26,
@@ -292,7 +292,7 @@
       "hasMain": true,
       "headerChildren": 0,
       "footerChildren": 0,
-      "mainContentLength": 703,
+      "mainContentLength": 935,
       "mainContentPreview": "🛡 Operator sign-in\n        \n          Demo mode — no real authentication backen",
       "hasInteractiveContent": false,
       "errors": []
@@ -491,7 +491,7 @@
       "url": "http://localhost:8889/assets/app.js",
       "status": 200,
       "ok": true,
-      "sizeBytes": 21316
+      "sizeBytes": 24178
     },
     {
       "asset": "assets/data.js",

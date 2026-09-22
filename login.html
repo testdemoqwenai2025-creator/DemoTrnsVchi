@@ -20,14 +20,17 @@
           <p class="text-sm text-muted mb-4">Demo mode — no real authentication backend.</p>
 
           <div class="callout" style="margin: 0 0 16px;">
-            <strong>Demo credentials</strong> (click below to auto-fill):
-            <div class="mono text-xs mt-2">email: operator@av-robotics.demo<br>password: demo-avops-2026</div>
+            <strong>RBAC demo accounts</strong> (click a button below to auto-fill):
+            <div class="mono text-xs mt-2" style="line-height:1.6;">
+              admin / admin → <span style="color:var(--accent);">ADMIN role</span> (can switch to synthetic/replay streams)<br>
+              testdemo / demo → <span style="color:var(--warn);">DEMO role</span> (production only — synthetic/replay locked)
+            </div>
           </div>
 
           <form id="login-form">
             <div class="form-group">
-              <label class="form-label" for="email">Email</label>
-              <input class="form-input" type="email" id="email" name="email" placeholder="operator@av-robotics.demo" autocomplete="email">
+              <label class="form-label" for="username">Username</label>
+              <input class="form-input" type="text" id="username" name="username" placeholder="admin" autocomplete="username">
             </div>
             <div class="form-group">
               <label class="form-label" for="password">Password</label>
@@ -38,10 +41,11 @@
             </div>
             <div id="login-error" class="form-error hidden"></div>
             <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">🚀 Sign in</button>
-            <button type="button" id="fill-demo" class="btn" style="width:100%; justify-content:center; margin-top:8px;">✨ Fill demo credentials</button>
+            <button type="button" id="fill-admin" class="btn" style="width:100%; justify-content:center; margin-top:8px;">✨ Fill admin credentials</button>
+            <button type="button" id="fill-demo" class="btn" style="width:100%; justify-content:center; margin-top:4px;">👤 Fill demo user credentials</button>
           </form>
 
-          <p class="text-xs text-muted mt-4">By signing in you agree to our <a href="privacy.html">privacy notice</a>. This is a demo — no real credentials are validated.</p>
+          <p class="text-xs text-muted mt-4">By signing in you agree to our <a href="privacy.html">privacy notice</a>. Stream switching is gated by role: admin can access all streams; testdemo is restricted to production.</p>
         </div>
       </div>
 
@@ -54,22 +58,30 @@
   <script src="assets/app.js"></script>
   <script>
     AVops.init('login.html');
+    document.getElementById('fill-admin').addEventListener('click', () => {
+      document.getElementById('username').value = 'admin';
+      document.getElementById('password').value = 'admin';
+      document.getElementById('login-error').classList.add('hidden');
+    });
     document.getElementById('fill-demo').addEventListener('click', () => {
-      document.getElementById('email').value = 'operator@av-robotics.demo';
-      document.getElementById('password').value = 'demo-avops-2026';
+      document.getElementById('username').value = 'testdemo';
+      document.getElementById('password').value = 'demo';
       document.getElementById('login-error').classList.add('hidden');
     });
     document.getElementById('login-form').addEventListener('submit', e => {
       e.preventDefault();
-      const email = document.getElementById('email').value.trim();
+      const username = document.getElementById('username').value.trim();
       const password = document.getElementById('password').value.trim();
       const err = document.getElementById('login-error');
-      if (!email) { err.textContent = 'Email is required.'; err.classList.remove('hidden'); return; }
+      if (!username) { err.textContent = 'Username is required.'; err.classList.remove('hidden'); return; }
       if (!password) { err.textContent = 'Password is required.'; err.classList.remove('hidden'); return; }
-      err.classList.add('hidden');
-      AVops.signIn(email);
-      // signIn reloads the page; if it didn't, redirect manually:
-      setTimeout(() => window.location.href = 'fleet.html', 100);
+      const success = AVops.signIn(username, password);
+      if (success) {
+        setTimeout(() => window.location.href = 'fleet.html', 100);
+      } else {
+        err.textContent = 'Invalid credentials. Use admin/admin or testdemo/demo.';
+        err.classList.remove('hidden');
+      }
     });
   </script>
 </body>

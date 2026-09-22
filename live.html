@@ -400,20 +400,28 @@
     }
 
     document.getElementById('inject-gnss-blackout').addEventListener('click', () => {
-      logInjection('⚠ Injected GNSS blackout — satellites drop to 0, IMU dead-reckoning drift begins climbing');
+      // Modify watchdog state: comms heartbeat expires (simulating GNSS loss)
+      for (const w of watchdogs) {
+        if (w.name === 'comms_heartbeat') {
+          w.lastKickAgoMs = 2500; // well past 1000ms period
+        }
+      }
+      logInjection('⚠ Injected GNSS blackout — satellites drop to 0, IMU dead-reckoning drift begins climbing. Watchdog comms_heartbeat now expired.');
     });
     document.getElementById('inject-occlusion').addEventListener('click', () => {
       // Drop all object confidences to simulate camera occlusion
       for (const o of objects) o.conf = Math.max(0.1, o.conf - 0.3);
-      logInjection('⚠ Injected camera occlusion — all object confidences dropped 0.3');
+      logInjection('⚠ Injected camera occlusion — all object confidences dropped 0.3. Avg confidence now ' + (objects.reduce((s, o) => s + o.conf, 0) / objects.length).toFixed(2));
     });
     document.getElementById('inject-phantom-brake').addEventListener('click', () => {
-      logInjection('⚠ Injected phantom-braking trigger — prediction node emitted false-positive emergency_brake intent');
+      // Add a fast-approaching "phantom" object that triggers emergency braking
+      objects.push({ id: 'obj_PHANTOM', class: 'pedestrian', pos: [15, 0], vel: [-8, 0], conf: 0.92 });
+      logInjection('⚠ Injected phantom-braking trigger — prediction node detected obj_PHANTOM at 15m approaching at 8m/s. Emergency brake intent emitted.');
     });
     document.getElementById('inject-spoofed-node').addEventListener('click', () => {
-      // Add a fake peer with absurd RSSI
-      peers.push({ id: 'peer_SPOOF', x: 0, y: 0, vx: 0, vy: 0, rssi: -10 });
-      logInjection('⚠ Injected spoofed V2X node peer_SPOOF — HSM signature invalid, packet dropped');
+      // Add a fake peer with absurd RSSI at ego position
+      peers.push({ id: 'peer_SPOOF', x: 0.5, y: 0.5, vx: 0, vy: 0, rssi: -10 });
+      logInjection('⚠ Injected spoofed V2X node peer_SPOOF at ego position with RSSI=-10dBm (impossible proximity). HSM signature invalid, packet dropped.');
     });
 
     // ============ Phase 10c: Stress test (30/60/120 Hz) ============

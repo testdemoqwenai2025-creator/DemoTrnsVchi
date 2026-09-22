@@ -41,15 +41,27 @@
     return new URLSearchParams(global.location.search).get(name);
   }
 
-  // ============================== SESSION ==============================
+  // ============================== SESSION (Phase 10d: RBAC) ==============================
   const SESSION_KEY = 'avops.session';
+  // Credentials: admin/admin → role admin; testdemo/demo → role testdemo
+  const CREDENTIALS = {
+    admin:    { password: 'admin', role: 'admin',    email: 'admin@av-robotics.demo' },
+    testdemo: { password: 'demo',  role: 'testdemo', email: 'testdemo@av-robotics.demo' },
+  };
   function getUser() {
     try { return JSON.parse(localStorage.getItem(SESSION_KEY)); } catch { return null; }
   }
-  function signIn(email) {
-    const u = { email, signedInAt: Date.now() };
+  function authenticate(username, password) {
+    const cred = CREDENTIALS[username];
+    if (!cred || cred.password !== password) return null;
+    return { email: cred.email, role: cred.role, signedInAt: Date.now() };
+  }
+  function signIn(username, password) {
+    const u = authenticate(username, password);
+    if (!u) return false;
     localStorage.setItem(SESSION_KEY, JSON.stringify(u));
     global.location.reload();
+    return true;
   }
   function signOut() {
     localStorage.removeItem(SESSION_KEY);
@@ -158,10 +170,17 @@
     const startBtn = el('a', { class: 'btn btn-primary', href: 'fleet.html' }, '🚀 Get Started');
     header.appendChild(startBtn);
 
-    // Auth
+    // Auth (Phase 10d: RBAC — shows role badge)
     const user = getUser();
     if (user) {
-      const userEmail = el('span', { class: 'text-xs text-muted hidden', style: 'display:none' }, user.email);
+      // Show role badge
+      const roleBadge = el('span', {
+        class: 'text-[9px] uppercase tracking-wider rounded-md px-1.5 py-0.5',
+        style: user.role === 'admin'
+          ? 'background:rgba(16,185,129,0.15); color:var(--accent);'
+          : 'background:rgba(245,158,11,0.15); color:var(--warn);',
+      }, user.role);
+      header.appendChild(roleBadge);
       const signOutBtn = el('button', { class: 'btn', type: 'button' }, '↪ Sign out');
       signOutBtn.addEventListener('click', signOut);
       header.appendChild(signOutBtn);
@@ -246,7 +265,20 @@
         return { content: titleMatch.title + ' — ' + titleMatch.summary, insight: 'Topic matched by keyword. Next phase: embedding-based retrieval over the knowledge vault for semantic matches.' };
       }
     }
-    return { content: 'I can help with AV/Robotics topics only. ' + SYSTEM_SCOPE + '\n\nTry: "What is LIDAR_DRIFT?", "Explain battery DoD limits", "How does MPC compare to PID?", or paste a diagnostic code.', insight: 'Fallback is the most common path right now. Next phase: add a "Did you mean…?" suggestion list drawn from knowledge vault titles.' };
+    return {
+      content: 'I can help with AV/Robotics topics only. ' + SYSTEM_SCOPE + '\n\nTry: "What is LIDAR_DRIFT?", "Explain battery DoD limits", "How does MPC compare to PID?", or paste a diagnostic code.',
+      insight: 'Fallback is the most common path right now. Next phase: add a "Did you mean…?" suggestion list drawn from knowledge vault titles.'
+    };
+  }
+
+  // Generate "Did you mean...?" suggestions from knowledge vault titles
+  function getSuggestions(query) {
+    var q = (query || '').toLowerCase().trim();
+    if (!q || q.length < 3) return [];
+    return global.MockData.knowledge
+      .filter(function(k) { return k.title.toLowerCase().includes(q.slice(0, 4)) || k.relatedCodes.some(function(c) { return c.toLowerCase().includes(q); }); })
+      .slice(0, 3)
+      .map(function(k) { return k.title; });
   }
 
   function initChat() {
@@ -266,7 +298,13 @@
       messages.appendChild(chatMsg('user', text));
       input.value = '';
       const r = respondTo(text);
-      messages.appendChild(chatMsg('assistant', r.content, r.insight));
+      // Check for "Did you mean...?" suggestions
+      var suggestions = getSuggestions(text);
+      var content = r.content;
+      if (suggestions.length > 0) {
+        content += '\n\nDid you mean: ' + suggestions.map(function(s) { return '"' + s + '"'; }).join(', ') + '?';
+      }
+      messages.appendChild(chatMsg('assistant', content, r.insight));
       messages.scrollTop = messages.scrollHeight;
     });
   }
@@ -312,14 +350,39 @@
     indicator.style.color = meta.tone;
     indicator.style.background = meta.bg;
     indicator.style.border = meta.border;
+    // RBAC: check if user can switch to each stream
+    const user = getUser();
+    const role = user ? user.role : null;
+    const canSwitch = function(target) {
+      if (!role) return false;       // not signed in → no switching
+      if (role === 'admin') return true;  // admin can switch to any
+      return target === 'production';     // testdemo can only view production
+    };
+    // If current stream is not allowed for this role, force back to production
+    if (!canSwitch(s)) {
+      localStorage.setItem(STREAM_KEY, 'production');
+      s = 'production';
+    }
+    const roleBadge = role
+      ? '<span style="background:' + (role === 'admin' ? 'rgba(16,185,129,0.2)' : 'rgba(245,158,11,0.2)') + '; color:' + (role === 'admin' ? 'var(--accent)' : 'var(--warn)') + '; padding:1px 4px; border-radius:3px; font-size:9px; text-transform:uppercase; letter-spacing:0.5px;">' + role + '</span>'
+      : '';
+    const streamButtons = ['production', 'synthetic', 'replay'].map(function(target) {
+      const allowed = canSwitch(target);
+      const isCurrent = s === target;
+      return '<button onclick="AVops.setStream(\'' + target + '\')" ' +
+        (allowed ? '' : 'disabled ') +
+        'style="background:none; border:none; color:inherit; cursor:' + (allowed ? 'pointer' : 'not-allowed') + '; padding:0 4px; font-size:10px;' + (allowed ? '' : 'opacity:0.3;') + (isCurrent ? ' text-decoration:underline;' : '') + '" ' +
+        'title="' + (allowed ? 'Switch to ' + target : 'Locked — ' + (role || 'not signed in') + ' role cannot access ' + target) + '">' +
+        (allowed ? '' : '🔒 ') + target.slice(0, 4).toUpperCase() +
+        '</button>';
+    }).join('');
     indicator.innerHTML = '<strong>' + meta.label + '</strong>' +
       ' <span style="opacity:0.6;">·</span> ' +
       '<span style="opacity:0.8;">' + (s === 'production' ? 'live_telemetry_feed' : s === 'synthetic' ? 'synth_scenario_007' : 'replay_session_2026_09_22') + '</span>' +
       (s === 'synthetic' ? ' <span style="color:var(--warn);" title="Synthetic data — not for live operational decisions">⚠</span>' : '') +
+      (roleBadge ? ' ' + roleBadge : '') +
       ' <span style="margin-left:8px; padding-left:8px; border-left:1px solid currentColor; opacity:0.6;">' +
-        '<button onclick="AVops.setStream(\'production\')" style="background:none; border:none; color:inherit; cursor:pointer; padding:0 4px; font-size:10px;">PROD</button>' +
-        '<button onclick="AVops.setStream(\'synthetic\')" style="background:none; border:none; color:inherit; cursor:pointer; padding:0 4px; font-size:10px;">SYNT</button>' +
-        '<button onclick="AVops.setStream(\'replay\')" style="background:none; border:none; color:inherit; cursor:pointer; padding:0 4px; font-size:10px;">REPL</button>' +
+        streamButtons +
       '</span>';
   }
 
