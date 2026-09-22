@@ -21,6 +21,40 @@
       <!-- Deep-link banner (from /planning?behaviour=…) -->
       <div id="deep-link-banner" class="hidden"></div>
 
+      <!-- 4D trajectory plan view SVG -->
+      <div class="card mb-4">
+        <div class="card-header"><div class="card-title">🛣 4D trajectory · plan view (X, Y) — colour = |jerk|</div></div>
+        <div class="card-body">
+          <svg viewBox="-5 -5 105 25" style="width:100%; height:240px; background:var(--panel-2); border-radius:6px;" preserveAspectRatio="xMidYMid meet">
+            <!-- lane ref -->
+            <line x1="0" y1="5" x2="100" y2="5" stroke="oklch(0.4 0 0)" stroke-width="0.3" stroke-dasharray="2 1"/>
+            <line x1="0" y1="15" x2="100" y2="15" stroke="oklch(0.4 0 0)" stroke-width="0.3" stroke-dasharray="2 1"/>
+            <!-- trajectory polyline (smooth lane change) -->
+            <polyline points="0,10 12,10 24,10 36,9 48,7 60,5 72,5 84,5 96,5" fill="none" stroke="oklch(0.72 0.18 162)" stroke-width="0.5"/>
+            <!-- trajectory points (coloured by jerk) -->
+            <circle cx="0" cy="10" r="0.6" fill="oklch(0.65 0.15 25)"/>
+            <circle cx="12" cy="10" r="0.6" fill="oklch(0.65 0.15 50)"/>
+            <circle cx="24" cy="10" r="0.6" fill="oklch(0.7 0.18 80)"/>
+            <circle cx="36" cy="9" r="0.6" fill="oklch(0.72 0.18 120)"/>
+            <circle cx="48" cy="7" r="0.6" fill="oklch(0.75 0.2 162)"/>
+            <circle cx="60" cy="5" r="0.6" fill="oklch(0.7 0.18 200)"/>
+            <circle cx="72" cy="5" r="0.6" fill="oklch(0.65 0.15 25)"/>
+            <circle cx="84" cy="5" r="0.6" fill="oklch(0.65 0.15 50)"/>
+            <circle cx="96" cy="5" r="0.6" fill="oklch(0.65 0.15 25)"/>
+            <!-- ego -->
+            <rect x="0" y="9" width="2" height="2" fill="oklch(0.78 0.16 80)" rx="0.3"/>
+            <text x="2" y="8" font-size="0.7" fill="oklch(0.78 0.16 80)">EGO</text>
+            <!-- target end -->
+            <circle cx="96" cy="5" r="0.8" fill="none" stroke="oklch(0.85 0 0)" stroke-width="0.15"/>
+            <text x="92" y="3" font-size="0.6" fill="oklch(0.85 0 0)">target</text>
+          </svg>
+          <div class="text-xs text-muted" style="margin-top:6px; display:flex; justify-content:space-between;">
+            <span>← X (m) · 0 → 96 m</span>
+            <span>Y (m) · lane change -5m over 8s · quintic polynomial</span>
+          </div>
+        </div>
+      </div>
+
       <div class="grid-2 mb-4">
         <div class="card">
           <div class="card-header"><div class="card-title">⚙ MPC solver status</div></div>

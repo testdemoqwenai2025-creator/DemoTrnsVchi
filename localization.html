@@ -18,6 +18,42 @@
         <p>HD maps, graph-based SLAM (LeGO-LOAM), GNSS/IMU tightly-coupled fusion with RTK, and visual-odometer fallback for GPS-denied zones.</p>
       </div>
 
+      <!-- HD Map SVG (matches sandbox /localization visualisation) -->
+      <div class="card mb-4">
+        <div class="card-header"><div class="card-title">🗺 HD Map view (top-down, ego frame)</div></div>
+        <div class="card-body">
+          <svg viewBox="-12 -8 50 16" style="width:100%; height:280px; background:var(--panel-2); border-radius:6px;" preserveAspectRatio="xMidYMid meet">
+            <!-- lane polygon -->
+            <polygon points="-10,-2.5 30,-2.5 30,2.5 -10,2.5" fill="oklch(0.3 0 0 / 0.4)" stroke="oklch(0.5 0 0)" stroke-width="0.08"/>
+            <!-- left boundary (dashed amber) -->
+            <line x1="-10" y1="-2.5" x2="30" y2="-2.5" stroke="oklch(0.78 0.16 80)" stroke-width="0.15" stroke-dasharray="0.6 0.4"/>
+            <!-- right boundary -->
+            <line x1="-10" y1="2.5" x2="30" y2="2.5" stroke="oklch(0.78 0.16 80)" stroke-width="0.15" stroke-dasharray="0.6 0.4"/>
+            <!-- stop line -->
+            <line x1="22" y1="-2.5" x2="22" y2="2.5" stroke="oklch(0.85 0 0)" stroke-width="0.2"/>
+            <!-- traffic light -->
+            <rect x="25" y="-3" width="1" height="0.5" fill="oklch(0.65 0.22 25)" stroke="oklch(0.85 0 0)" stroke-width="0.05"/>
+            <!-- ego pose (emerald triangle, rotated to heading 95°) -->
+            <g transform="rotate(5)">
+              <polygon points="0,-0.8 0.6,0.5 -0.6,0.5" fill="oklch(0.72 0.18 162)" stroke="oklch(0.85 0.18 162)" stroke-width="0.05"/>
+            </g>
+            <text x="0.8" y="-0.6" font-size="0.6" fill="oklch(0.72 0.18 162)">EGO (SLAM)</text>
+            <!-- GNSS pose offset (small blue circle) -->
+            <circle cx="0.15" cy="-0.1" r="0.4" fill="oklch(0.75 0.13 230)" opacity="0.7"/>
+            <text x="0.8" y="0.4" font-size="0.5" fill="oklch(0.75 0.13 230)">● GNSS pose</text>
+            <!-- divergence arrow -->
+            <line x1="0" y1="0" x2="0.15" y2="-0.1" stroke="oklch(0.85 0 0)" stroke-width="0.05" marker-end="url(#loc-arrow)"/>
+            <!-- legend -->
+            <text x="-11" y="-7" font-size="0.5" fill="oklch(0.7 0 0)">— SLAM pose (emerald triangle)  ● GNSS pose (blue dot)  divergence: 0.42 m</text>
+            <defs>
+              <marker id="loc-arrow" markerWidth="4" markerHeight="4" refX="3" refY="2" orient="auto">
+                <path d="M0,0 L4,2 L0,4 Z" fill="oklch(0.85 0 0)"/>
+              </marker>
+            </defs>
+          </svg>
+        </div>
+      </div>
+
       <div class="grid-2 mb-4">
         <div class="card">
           <div class="card-header"><div class="card-title">🗺 HD map &amp; pose divergence</div></div>
