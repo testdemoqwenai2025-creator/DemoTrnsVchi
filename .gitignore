@@ -1,0 +1,6 @@
+# Public preview repo — keep it lean, no build artifacts.
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log

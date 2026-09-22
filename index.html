@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="AV/Robotics Operations Center — compartmentalized operations console for autonomous vehicles and robotics fleets. Public preview." />
+  <title>AV / Robotics Operations Center — Public Preview</title>
+  <style>
+    :root {
+      --bg: #0a0e0d;
+      --panel: #11161a;
+      --panel-2: #161b1f;
+      --border: rgba(255,255,255,0.08);
+      --fg: #e8eef0;
+      --muted: #8a9498;
+      --accent: #10b981;
+      --warn: #f59e0b;
+      --fault: #ef4444;
+      --info: #38bdf8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif;
+      background: var(--bg);
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 32px 32px;
+      color: var(--fg);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    .container { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+    header.hero {
+      border-bottom: 1px solid var(--border);
+      padding: 56px 0 40px;
+      background: radial-gradient(ellipse at top, rgba(16,185,129,0.08), transparent 60%);
+    }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--accent);
+      background: rgba(16,185,129,0.08);
+      padding: 5px 10px; border-radius: 999px;
+      border: 1px solid rgba(16,185,129,0.25);
+    }
+    .eyebrow::before {
+      content: ""; width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent); animation: pulse 1.6s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+    h1 {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 700; letter-spacing: -0.02em;
+      margin: 20px 0 12px; line-height: 1.1;
+    }
+    .lede { font-size: 17px; color: var(--muted); max-width: 720px; margin: 0 0 24px; }
+    .hero-meta { display: flex; flex-wrap: wrap; gap: 12px; font-size: 13px; color: var(--muted); }
+    .hero-meta span { display: inline-flex; align-items: center; gap: 6px; }
+    .hero-meta code {
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: var(--panel); padding: 2px 6px; border-radius: 4px; color: var(--fg);
+    }
+    main { padding: 48px 0 64px; }
+    .section { margin-bottom: 56px; }
+    .section h2 {
+      font-size: 22px; font-weight: 600; margin: 0 0 8px; letter-spacing: -0.01em;
+    }
+    .section p { color: var(--muted); margin: 0 0 20px; max-width: 720px; }
+    .stats {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px; margin: 24px 0 8px;
+    }
+    .stat {
+      background: var(--panel); border: 1px solid var(--border);
+      padding: 16px 18px; border-radius: 10px;
+    }
+    .stat .label {
+      font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 6px;
+    }
+    .stat .value { font-size: 28px; font-weight: 600; letter-spacing: -0.02em; }
+    .stat .sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+    .stat.active .value { color: var(--accent); }
+    .stat.warn .value { color: var(--warn); }
+    .modules {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+    }
+    .module {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden;
+      transition: transform 0.15s ease, border-color 0.15s ease;
+    }
+    .module:hover { transform: translateY(-2px); border-color: rgba(16,185,129,0.4); }
+    .module-img {
+      width: 100%; aspect-ratio: 16 / 10; object-fit: cover;
+      border-bottom: 1px solid var(--border); background: var(--panel-2);
+      display: block;
+    }
+    .module-body { padding: 16px 18px 18px; }
+    .module-tag {
+      display: inline-block; font-size: 10px; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 6px;
+    }
+    .module-body h3 { margin: 0 0 6px; font-size: 15px; font-weight: 600; }
+    .module-body p { margin: 0; font-size: 13px; color: var(--muted); }
+    .stack {
+      display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px;
+    }
+    .chip {
+      font-size: 12px; padding: 4px 10px; border-radius: 6px;
+      background: var(--panel); border: 1px solid var(--border);
+      color: var(--muted); font-family: ui-monospace, monospace;
+    }
+    .callout {
+      margin: 32px 0; padding: 18px 20px;
+      background: linear-gradient(135deg, rgba(16,185,129,0.06), rgba(56,189,248,0.04));
+      border: 1px solid rgba(16,185,129,0.2); border-radius: 12px;
+    }
+    .callout strong { color: var(--accent); }
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 24px 0; margin-top: 40px;
+      font-size: 12px; color: var(--muted);
+      display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between;
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+    .private-note {
+      font-size: 11px; color: var(--muted); margin-top: 8px;
+      padding: 8px 12px; background: var(--panel); border-radius: 6px;
+      border-left: 2px solid var(--warn);
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="container">
+      <span class="eyebrow">System nominal · v0.9.0</span>
+      <h1>Autonomous Vehicles &amp; Robotics<br/>Operations Center</h1>
+      <p class="lede">
+        A compartmentalized operations console for monitoring, commanding, and reasoning about
+        autonomous-vehicle and robotics fleets — fleet overview, live telemetry at 5 Hz,
+        mission control, joint-level robotics console, diagnostics, and an in-app knowledge vault.
+      </p>
+      <div class="hero-meta">
+        <span>📡 <code>20 assets</code></span>
+        <span>🟢 <code>18 online</code></span>
+        <span>⚠️ <code>2 active alerts</code></span>
+        <span>⏱️ <code>telemetry @ 5 Hz</code></span>
+        <span>🔒 <code>NDA-free preview</code></span>
+      </div>
+      <div class="private-note">
+        This public page is a preview only. Source code, type contracts, architecture files,
+        and worklogs live in the private repo
+        <a href="https://github.com/testdemoqwenai2025-creator/RoboTrnsVchi" target="_blank" rel="noopener">
+          <code>RoboTrnsVchi</code>
+        </a>.
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <section class="section">
+        <h2>Compartmentalized by design</h2>
+        <p>
+          Every concern lives in exactly one compartment. Compartments communicate only through
+          declared interfaces (typed stores, API routes, event emitters). This keeps the system
+          testable, replaceable, and reviewable in isolation — and it means a real backend can
+          be slotted in by replacing a single file.
+        </p>
+        <div class="stats">
+          <div class="stat active">
+            <div class="label">Assets tracked</div>
+            <div class="value">20</div>
+            <div class="sub">12 vehicles · 8 robots</div>
+          </div>
+          <div class="stat">
+            <div class="label">Compartments</div>
+            <div class="value">9</div>
+            <div class="sub">3 foundation · 6 modules</div>
+          </div>
+          <div class="stat warn">
+            <div class="label">Sensor streams</div>
+            <div class="value">7</div>
+            <div class="sub">per asset · 5 Hz</div>
+          </div>
+          <div class="stat">
+            <div class="label">Knowledge entries</div>
+            <div class="value">12</div>
+            <div class="sub">cross-linked</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Module screenshots</h2>
+        <p>
+          Each module is a self-contained compartment. Click through the live application to see
+          real-time telemetry, mission CRUD, joint nudge + animated schematic, alert acknowledgement,
+          and cross-module asset selection.
+        </p>
+        <div class="modules">
+          <article class="module">
+            <img class="module-img" src="screenshots/fleet-module.png" alt="Fleet Overview module" loading="lazy" />
+            <div class="module-body">
+              <span class="module-tag">M1 · Fleet</span>
+              <h3>Fleet Overview</h3>
+              <p>KPI cards, filterable registry of every AV and robot, status breakdown donut.</p>
+            </div>
+          </article>
+          <article class="module">
+            <img class="module-img" src="screenshots/telemetry-module.png" alt="Live Telemetry module" loading="lazy" />
+            <div class="module-body">
+              <span class="module-tag">M2 · Telemetry</span>
+              <h3>Live Telemetry</h3>
+              <p>5 Hz sensor stream across 7 sensor kinds, with threshold-based warn/fault coloring.</p>
+            </div>
+          </article>
+          <article class="module">
+            <img class="module-img" src="screenshots/missions-module.png" alt="Mission Control module" loading="lazy" />
+            <div class="module-body">
+              <span class="module-tag">M3 · Missions</span>
+              <h3>Mission Control</h3>
+              <p>Kanban board with create / start / complete / cancel and waypoint detail.</p>
+            </div>
+          </article>
+          <article class="module">
+            <img class="module-img" src="screenshots/robotics-module.png" alt="Robotics Console module" loading="lazy" />
+            <div class="module-body">
+              <span class="module-tag">M4 · Robotics</span>
+              <h3>Robotics Console</h3>
+              <p>Joint table with nudge controls, gripper state, animated 7-DoF SVG schematic.</p>
+            </div>
+          </article>
+          <article class="module">
+            <img class="module-img" src="screenshots/diagnostics-module.png" alt="Diagnostics Hub module" loading="lazy" />
+            <div class="module-body">
+              <span class="module-tag">M5 · Diagnostics</span>
+              <h3>Diagnostics Hub</h3>
+              <p>Severity-sorted alerts, fleet-health radar, maintenance schedule with completion.</p>
+            </div>
+          </article>
+          <article class="module">
+            <img class="module-img" src="screenshots/knowledge-module.png" alt="Knowledge Vault module" loading="lazy" />
+            <div class="module-body">
+              <span class="module-tag">M6 · Knowledge</span>
+              <h3>Knowledge Vault</h3>
+              <p>Searchable AV/Robotics encyclopedia with related-code / asset-class cross-navigation.</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Technology</h2>
+        <p>
+          The platform is built on a modern TypeScript stack, chosen for type-safety, server-component
+          ergonomics, and a path to production deployment.
+        </p>
+        <div class="stack">
+          <span class="chip">Next.js 16</span>
+          <span class="chip">TypeScript 5</span>
+          <span class="chip">Tailwind CSS 4</span>
+          <span class="chip">shadcn/ui</span>
+          <span class="chip">Zustand</span>
+          <span class="chip">TanStack Query</span>
+          <span class="chip">Recharts</span>
+          <span class="chip">Framer Motion</span>
+          <span class="chip">Prisma (SQLite)</span>
+          <span class="chip">next-themes</span>
+          <span class="chip">Socket.io (ready)</span>
+        </div>
+      </section>
+
+      <div class="callout">
+        <strong>For investors &amp; partners.</strong> This page is the canonical NDA-free preview
+        of the platform. The full source, architecture, and design documentation are available
+        under NDA in the private repository
+        <a href="https://github.com/testdemoqwenai2025-creator/RoboTrnsVchi" target="_blank" rel="noopener">
+          <code>RoboTrnsVchi</code>
+        </a>.
+        To request access or schedule a guided demo, contact the project owner.
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container" style="display:flex; flex-wrap:wrap; gap:16px; justify-content:space-between; width:100%;">
+      <span>© AV/Robotics Operations Center · Compartmentalized build</span>
+      <span>
+        <a href="https://github.com/testdemoqwenai2025-creator/RoboTrnsVchi" target="_blank" rel="noopener">Private repo</a>
+        &nbsp;·&nbsp;
+        <a href="https://github.com/testdemoqwenai2025-creator/DemoTrnsVchi" target="_blank" rel="noopener">Public repo</a>
+      </span>
+    </div>
+  </footer>
+</body>
+</html>
