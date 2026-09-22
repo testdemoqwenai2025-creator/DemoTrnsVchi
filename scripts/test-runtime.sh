@@ -65,9 +65,10 @@ declare -A INTERACTIVE_TEST=(
 PASS=0
 FAIL=0
 RESULTS=()
+FAILURE_REASONS=()
 
-printf "\n%-30s  %-8s  %-8s  %-8s  %-12s  %s\n" "PAGE" "LOADS" "HEADER" "FOOTER" "CONTENT" "INTERACTIVE"
-printf "%.0s─" {1..100}; printf "\n"
+printf "\n%-30s  %-8s  %-8s  %-8s  %-12s  %-8s  %s\n" "PAGE" "LOADS" "HEADER" "FOOTER" "CONTENT" "HTMLLEAK" "INTERACTIVE"
+printf "%.0s─" {1..110}; printf "\n"
 
 for page in "${PAGES[@]}"; do
   URL="$BASE_URL/$page"
@@ -88,19 +89,27 @@ for page in "${PAGES[@]}"; do
   # Check main content
   MAIN_LEN=$(agent-browser eval "(document.querySelector('main') || {innerText:''}).innerText.length" 2>&1 | tail -1 | tr -d '"')
 
+  # Check for raw HTML leaking into rendered text (the Phase 7 bug class:
+  # AVops.el() used to render HTML strings as literal text via createTextNode).
+  # After the fix, this count should be 0 on every page.
+  RAW_HTML_LEAKS=$(agent-browser eval "(function(){const txt = (document.querySelector('main') || {innerText:''}).innerText; const matches = txt.match(/<\/?(?:span|div|strong|em|code|a|p|button|svg|table|td|tr|th|thead|tbody|ul|ol|li|h[1-6])\b[^>]*>/gi) || []; return matches.length;})()" 2>&1 | tail -1 | tr -d '"')
+
   # Run interactive test if one is defined
   INTERACTIVE="-"
   if [[ -n "${INTERACTIVE_TEST[$page]:-}" ]]; then
     INTERACTIVE=$(agent-browser eval "${INTERACTIVE_TEST[$page]}" 2>&1 | tail -1 | tr -d '"')
   fi
 
-  # Status icons
-  if [[ "$ERR_COUNT" == "0" && "$HEADER_COUNT" != "0" && "$FOOTER_COUNT" != "0" && "$MAIN_LEN" != "0" ]]; then
+  # Status icons — fail if any raw HTML leaks into the rendered text
+  if [[ "$ERR_COUNT" == "0" && "$HEADER_COUNT" != "0" && "$FOOTER_COUNT" != "0" && "$MAIN_LEN" != "0" && "$RAW_HTML_LEAKS" == "0" ]]; then
     STATUS="✓ PASS"
     PASS=$((PASS+1))
   else
     STATUS="✗ FAIL"
     FAIL=$((FAIL+1))
+    if [[ "$RAW_HTML_LEAKS" != "0" ]]; then
+      FAILURE_REASONS+=("$page: $RAW_HTML_LEAKS raw HTML tag(s) leaking into rendered text")
+    fi
   fi
 
   # Color the status
@@ -113,12 +122,22 @@ for page in "${PAGES[@]}"; do
   HEADER_STR=$([ "$HEADER_COUNT" != "0" ] && echo $'\e[32m✓\e[0m'" $HEADER_COUNT" || echo $'\e[31m✗ 0\e[0m')
   FOOTER_STR=$([ "$FOOTER_COUNT" != "0" ] && echo $'\e[32m✓\e[0m'" $FOOTER_COUNT" || echo $'\e[31m✗ 0\e[0m')
   MAIN_STR=$([ "$MAIN_LEN" != "0" ] && echo $'\e[32m✓\e[0m'" $MAIN_LEN" || echo $'\e[31m✗ 0\e[0m')
+  LEAK_STR=$([ "$RAW_HTML_LEAKS" == "0" ] && echo $'\e[32m✓ 0\e[0m' || echo $'\e[31m✗ '"$RAW_HTML_LEAKS")
 
-  printf "%-30s  %-8s  %-8s  %-8s  %-12s  %s\n" "$page" "$STATUS_STR" "$HEADER_STR" "$FOOTER_STR" "$MAIN_STR chars" "$INTERACTIVE"
+  printf "%-30s  %-8s  %-8s  %-8s  %-12s  %-8s  %s\n" "$page" "$STATUS_STR" "$HEADER_STR" "$FOOTER_STR" "$MAIN_STR chars" "$LEAK_STR" "$INTERACTIVE"
 done
 
-printf "%.0s─" {1..100}; printf "\n"
+printf "%.0s─" {1..110}; printf "\n"
 printf "Summary: %d passed, %d failed (out of %d)\n\n" "$PASS" "$FAIL" "${#PAGES[@]}"
+
+# Print failure reasons if any
+if [[ ${#FAILURE_REASONS[@]} -gt 0 ]]; then
+  printf "Failure reasons:\n"
+  for reason in "${FAILURE_REASONS[@]}"; do
+    printf "  • %s\n" "$reason"
+  done
+  printf "\n"
+fi
 
 # Close the browser
 agent-browser close > /dev/null 2>&1 || true

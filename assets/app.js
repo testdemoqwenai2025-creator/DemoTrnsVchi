@@ -21,7 +21,15 @@
       (Array.isArray(children) ? children : [children]).forEach(c => {
         if (c == null) return;
         if (typeof c === 'string' || typeof c === 'number' || typeof c === 'boolean') {
-          e.appendChild(document.createTextNode(String(c)));
+          // Detect HTML strings (contain a tag) and route through innerHTML
+          // so they render as elements instead of literal text. Plain text
+          // strings without tags go through createTextNode to stay safe.
+          const str = String(c);
+          if (str.includes('<') && str.includes('>') && /<\/?[a-z][\s\S]*>/i.test(str)) {
+            e.insertAdjacentHTML('beforeend', str);
+          } else {
+            e.appendChild(document.createTextNode(str));
+          }
         } else {
           e.appendChild(c);
         }
