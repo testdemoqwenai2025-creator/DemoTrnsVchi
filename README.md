@@ -12,20 +12,25 @@ Once GitHub Pages finishes building, the preview will be available at:
 
 ## What you'll see
 
-A compartmentalized operations console for an autonomous-vehicles-and-robotics fleet. The live application is hosted in a separate sandbox environment; this Pages site serves as a public-facing summary with embedded screenshots of every module.
+A compartmentalized **Multi-Page Application** (Next.js App Router) for an autonomous-vehicles-and-robotics fleet. Every module is its own URL — bookmarkable and refresh-safe — with shared chrome (header, GDPR footer, theme toggle) on every page.
 
-| Module | What it shows |
-|--------|---------------|
+| Page | What it shows |
+|------|---------------|
+| `/` | Landing with hero, compartment map, CTA buttons |
 | **Fleet Overview** | Aggregate status of every AV and robot — KPIs, registry table, status donut |
 | **Live Telemetry** | 5 Hz sensor streams (LiDAR, camera, IMU, GPS, battery, temperature, torque) with threshold-based warn/fault coloring |
 | **Mission Control** | Kanban board of queued / active / completed / cancelled missions with waypoint detail |
 | **Robotics Console** | Joint-level state, end-effector pose, gripper control, animated 7-DoF SVG schematic |
 | **Diagnostics Hub** | Severity-sorted alerts with acknowledgement, fleet-health radar, maintenance schedule |
 | **Knowledge Vault** | Searchable AV/Robotics encyclopedia with cross-link navigation |
+| **Login** | Demo login form with auto-fill button (`operator@av-robotics.demo` / `demo-avops-2026`) |
+| **Search** | Cross-module search across fleet, missions, and knowledge entries |
+| **AI Chat** | Theme-scoped assistant (AV/Robotics only) + links to 8 free AI platforms |
+| **Privacy** | Full 5-section GDPR privacy notice |
 
 ## Screenshots
 
-The `screenshots/` directory contains one PNG per module. They are also embedded in the Pages landing page (`index.html`).
+The `screenshots/` directory contains one PNG per module and per cross-cutting page. They are also embedded in the Pages landing page (`index.html`).
 
 ## License & access
 
