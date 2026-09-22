@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Live demo: self-contained dynamic AV/Robotics operations console with perception drift, V2V mesh, watchdogs, and traffic phase — no backend, no socket, all client-side.">
+  <title>Live Demo · AV/Robotics Ops Center</title>
+  <link rel="stylesheet" href="assets/styles.css">
+  <style>
+    .live-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 900px) { .live-grid { grid-template-columns: 1fr; } }
+    .live-svg { width: 100%; height: 220px; display: block; background: var(--panel-2); border-radius: 6px; }
+    .watchdog-bar { height: 6px; background: var(--panel-2); border-radius: 3px; overflow: hidden; }
+    .watchdog-bar-fill { height: 100%; transition: width 0.2s; }
+    .traffic-light {
+      display: inline-flex; flex-direction: column; gap: 4px;
+      padding: 6px; border: 1px solid var(--border); border-radius: 6px;
+      background: var(--panel-2);
+    }
+    .traffic-light span {
+      display: block; width: 24px; height: 24px; border-radius: 50%;
+      background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+    }
+    .traffic-light span.active.red { background: var(--fault); box-shadow: 0 0 8px var(--fault); }
+    .traffic-light span.active.yellow { background: var(--warn); box-shadow: 0 0 8px var(--warn); }
+    .traffic-light span.active.green { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+    .fps-counter {
+      position: fixed; top: 64px; right: 16px;
+      background: var(--panel); border: 1px solid var(--border);
+      padding: 4px 10px; border-radius: 6px;
+      font-family: ui-monospace, monospace; font-size: 11px;
+      color: var(--accent);
+      z-index: 30;
+    }
+    .fps-counter::before { content: '● '; animation: pulse 1s infinite; }
+  </style>
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to content</a>
+  <div id="site-header"></div>
+  <div id="mobile-nav-host"></div>
+  <div class="fps-counter" id="fps">— fps</div>
+
+  <main id="main">
+    <div class="container">
+      <div class="page-header">
+        <h1>Live Demo</h1>
+        <p>Self-contained dynamic operations console — perception objects drift at 5 Hz, V2V mesh moves, watchdog timers tick, traffic-light phase changes. <strong style="color:var(--accent);">No backend, no socket, all client-side.</strong> Open this page in a new tab; the rest of the site stays static.</p>
+      </div>
+
+      <div class="callout">
+        <strong>This is the "pop browser page" approach.</strong> The main GitHub Pages site stays pure static (good for SEO, free hosting, no Node server). When you want to show investors dynamic behavior, link them here — everything updates in real-time using only <code>setInterval</code> and client-side mock state. No socket required.
+      </div>
+
+      <div class="live-grid">
+
+        <!-- Live Perception -->
+        <div class="card">
+          <div class="card-header"><div class="card-title">👁 Live perception (5 Hz · <span id="obj-count">8</span> objects)</div></div>
+          <div class="card-body">
+            <svg class="live-svg" id="perception-svg" viewBox="-30 -12 60 24" preserveAspectRatio="xMidYMid meet"></svg>
+            <div class="text-xs text-muted mt-2">Each circle is a tracked object. Position drifts at 5 Hz based on velocity × tick.</div>
+          </div>
+        </div>
+
+        <!-- Live V2V mesh -->
+        <div class="card">
+          <div class="card-header"><div class="card-title">📡 Live V2V mesh (5 Hz · <span id="peer-count">6</span> peers)</div></div>
+          <div class="card-body">
+            <svg class="live-svg" id="v2v-svg" viewBox="-50 -35 100 70" preserveAspectRatio="xMidYMid meet"></svg>
+            <div class="text-xs text-muted mt-2">Ego at center. Peers move based on velocity × heading × tick. Link opacity = RSSI strength.</div>
+          </div>
+        </div>
+
+        <!-- Live Watchdogs -->
+        <div class="card">
+          <div class="card-header"><div class="card-title">⏱ Live watchdogs (5 Hz)</div></div>
+          <div class="card-body" id="watchdogs-body"></div>
+        </div>
+
+        <!-- Live Traffic Light -->
+        <div class="card">
+          <div class="card-header"><div class="card-title">🚦 Live V2I traffic light (auto-cycle)</div></div>
+          <div class="card-body">
+            <div style="display:flex; align-items:center; gap:16px;">
+              <div class="traffic-light" id="traffic-light">
+                <span class="red"></span>
+                <span class="yellow"></span>
+                <span class="green"></span>
+              </div>
+              <div class="text-sm">
+                <div>Phase: <span class="mono" id="tl-phase" style="color:var(--accent);">green</span></div>
+                <div>Time to change: <span class="mono" id="tl-countdown">8s</span></div>
+                <div>Recommended speed: <span class="mono" id="tl-speed">42 kph</span></div>
+              </div>
+            </div>
+            <div class="text-xs text-muted mt-3">Auto-cycles green → yellow → red every ~15s.</div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="card mt-4">
+        <div class="card-header"><div class="card-title">📊 Live stats</div></div>
+        <div class="card-body">
+          <div class="grid-4">
+            <div class="stat"><div class="stat-label">Frame</div><div class="stat-value mono" id="frame-num">0</div><div class="stat-sub" id="frame-ts">—</div></div>
+            <div class="stat"><div class="stat-label">Avg confidence</div><div class="stat-value mono" id="avg-conf">0.00</div><div class="stat-sub">across all tracked objects</div></div>
+            <div class="stat"><div class="stat-label">Healthy watchdogs</div><div class="stat-value mono" id="healthy-wd">—</div><div class="stat-sub" id="total-wd">of —</div></div>
+            <div class="stat"><div class="stat-label">Avg RSSI</div><div class="stat-value mono" id="avg-rssi">—</div><div class="stat-sub">across all V2V peers</div></div>
+          </div>
+        </div>
+      </div>
+
+      <p class="text-center mt-4 text-xs">
+        <a href="index.html">← Back to static site</a>
+      </p>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+  <script src="assets/data.js"></script>
+  <script src="assets/app.js"></script>
+  <script>
+    AVops.init('live.html');
+
+    // ============ Live state ============
+    const objects = MockData.perception.objects.map(o => ({
+      id: o.id, class: o.class,
+      pos: [o.pos[0], o.pos[1]],
+      vel: [o.vel[0], o.vel[1]],
+      conf: o.conf,
+    }));
+    const peers = MockData.v2x.peers.map(p => ({
+      id: p.id, x: p.x, y: p.y,
+      vx: p.vel * Math.cos(p.heading * Math.PI / 180),
+      vy: p.vel * Math.sin(p.heading * Math.PI / 180),
+      rssi: p.rssi,
+    }));
+    const watchdogs = [
+      { name: 'perception_heartbeat', periodMs: 100, lastKickAgoMs: 0 },
+      { name: 'planner_heartbeat', periodMs: 50, lastKickAgoMs: 0 },
+      { name: 'control_loop', periodMs: 20, lastKickAgoMs: 0 },
+      { name: 'comms_heartbeat', periodMs: 1000, lastKickAgoMs: 0, expires: true },
+      { name: 'safety_supervisor', periodMs: 200, lastKickAgoMs: 0 },
+    ];
+
+    let frameNum = 0;
+    let tlPhase = 'green';
+    let tlSecToChange = 8;
+    let lastTs = performance.now();
+    let fpsAccum = 0;
+    let fpsCount = 0;
+
+    // ============ Render functions ============
+    function renderPerception() {
+      const svg = document.getElementById('perception-svg');
+      let html = '';
+      // ego triangle
+      html += '<polygon points="0,-0.8 0.6,0.5 -0.6,0.5" fill="oklch(0.72 0.18 162)" stroke="oklch(0.85 0 0)" stroke-width="0.1"/>';
+      html += '<text x="1" y="-0.5" font-size="0.8" fill="oklch(0.85 0 0)">EGO</text>';
+      // ego FOV cone
+      html += '<path d="M0,0 L20,-10 L20,10 Z" fill="oklch(0.72 0.18 162 / 0.08)" stroke="oklch(0.5 0 0)" stroke-width="0.05"/>';
+      // objects
+      objects.forEach(o => {
+        const color = o.class === 'pedestrian' ? 'oklch(0.78 0.16 80)'
+                    : o.class === 'vehicle' ? 'oklch(0.75 0.13 230)'
+                    : o.class === 'cyclist' ? 'oklch(0.72 0.18 162)'
+                    : 'oklch(0.6 0 0)';
+        const r = Math.max(0.4, o.conf * 1.2);
+        html += '<circle cx="' + o.pos[0] + '" cy="' + o.pos[1] + '" r="' + r + '" fill="' + color + '" opacity="' + (0.5 + o.conf * 0.5) + '"/>';
+        html += '<text x="' + o.pos[0] + '" y="' + (o.pos[1] - r - 0.4) + '" font-size="0.5" fill="oklch(0.7 0 0)" text-anchor="middle">' + o.id + '</text>';
+      });
+      svg.innerHTML = html;
+      document.getElementById('obj-count').textContent = objects.length;
+      const avgConf = objects.reduce((s, o) => s + o.conf, 0) / objects.length;
+      document.getElementById('avg-conf').textContent = avgConf.toFixed(2);
+    }
+
+    function renderV2V() {
+      const svg = document.getElementById('v2v-svg');
+      let html = '';
+      // ego
+      html += '<circle cx="0" cy="0" r="2.5" fill="oklch(0.72 0.18 162)" stroke="oklch(0.85 0 0)" stroke-width="0.4"/>';
+      html += '<text x="0" y="-4" font-size="2.5" fill="oklch(0.85 0 0)" text-anchor="middle">EGO</text>';
+      // links
+      peers.forEach(p => {
+        const opacity = Math.max(0.2, 1 - Math.abs(p.rssi) / 100);
+        html += '<line x1="0" y1="0" x2="' + p.x + '" y2="' + p.y + '" stroke="oklch(0.5 0 0)" stroke-width="0.3" stroke-dasharray="1 0.6" opacity="' + opacity + '"/>';
+      });
+      // peers
+      peers.forEach(p => {
+        html += '<circle cx="' + p.x + '" cy="' + p.y + '" r="1.8" fill="oklch(0.75 0.13 230)" stroke="oklch(0.85 0 0)" stroke-width="0.2"/>';
+        html += '<text x="' + p.x + '" y="' + (p.y - 3) + '" font-size="2" fill="oklch(0.85 0 0)" text-anchor="middle">' + p.id + '</text>';
+      });
+      svg.innerHTML = html;
+      document.getElementById('peer-count').textContent = peers.length;
+      const avgRssi = Math.round(peers.reduce((s, p) => s + p.rssi, 0) / peers.length);
+      document.getElementById('avg-rssi').textContent = avgRssi + ' dBm';
+    }
+
+    function renderWatchdogs() {
+      const host = document.getElementById('watchdogs-body');
+      let html = '';
+      let healthy = 0;
+      watchdogs.forEach(w => {
+        const ratio = Math.min(1, w.lastKickAgoMs / w.periodMs);
+        const expired = w.lastKickAgoMs > w.periodMs;
+        const tone = expired ? 'fault' : ratio > 0.7 ? 'warn' : 'active';
+        const color = expired ? 'var(--fault)' : ratio > 0.7 ? 'var(--warn)' : 'var(--accent)';
+        if (!expired) healthy++;
+        html += '<div style="margin-bottom:10px;">';
+        html += '<div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:3px;">';
+        html += '<span class="mono">' + w.name + '</span>';
+        html += '<span><span class="badge badge-' + tone + '">' + (expired ? 'expired' : 'healthy') + '</span> <span class="mono text-muted">' + Math.round(w.lastKickAgoMs) + 'ms</span></span>';
+        html += '</div>';
+        html += '<div class="watchdog-bar"><div class="watchdog-bar-fill" style="width:' + (ratio * 100) + '%; background:' + color + ';"></div></div>';
+        html += '</div>';
+      });
+      host.innerHTML = html;
+      document.getElementById('healthy-wd').textContent = healthy;
+      document.getElementById('total-wd').textContent = 'of ' + watchdogs.length;
+    }
+
+    function renderTrafficLight() {
+      const lights = document.getElementById('traffic-light').children;
+      for (const l of lights) l.classList.remove('active');
+      const idx = tlPhase === 'red' ? 0 : tlPhase === 'yellow' ? 1 : 2;
+      lights[idx].classList.add('active');
+      document.getElementById('tl-phase').textContent = tlPhase;
+      document.getElementById('tl-phase').style.color = tlPhase === 'red' ? 'var(--fault)' : tlPhase === 'yellow' ? 'var(--warn)' : 'var(--accent)';
+      document.getElementById('tl-countdown').textContent = Math.ceil(tlSecToChange) + 's';
+      const recSpeed = tlPhase === 'green' ? 42 : tlPhase === 'yellow' ? 20 : 0;
+      document.getElementById('tl-speed').textContent = recSpeed + ' kph';
+    }
+
+    function renderFrameStats(ts) {
+      const dt = ts - lastTs;
+      lastTs = ts;
+      if (dt > 0) {
+        fpsAccum += 1000 / dt;
+        fpsCount++;
+      }
+      document.getElementById('frame-num').textContent = frameNum;
+      document.getElementById('frame-ts').textContent = new Date().toLocaleTimeString('en-GB', { hour12: false });
+      if (fpsCount > 0) {
+        document.getElementById('fps').textContent = Math.round(fpsAccum / fpsCount) + ' fps';
+      }
+    }
+
+    // ============ Tick at 5 Hz ============
+    setInterval(() => {
+      frameNum++;
+      const TICK = 0.2; // seconds
+
+      // Drift perception objects
+      for (const o of objects) {
+        o.pos[0] += o.vel[0] * TICK;
+        o.pos[1] += o.vel[1] * TICK;
+        o.conf = Math.min(0.99, Math.max(0.4, o.conf + (Math.random() - 0.5) * 0.04));
+        if (o.pos[0] > 25) o.pos[0] = -25;
+        if (o.pos[0] < -25) o.pos[0] = 25;
+        if (Math.abs(o.pos[1]) > 10) o.pos[1] = -o.pos[1];
+      }
+
+      // Drift V2V peers
+      for (const p of peers) {
+        p.x += p.vx * TICK;
+        p.y += p.vy * TICK;
+        p.rssi = -45 - Math.abs(Math.round(Math.sin(frameNum / 15 + p.id.charCodeAt(5)) * 20));
+        if (Math.abs(p.x) > 45) { p.vx = -p.vx; p.x = Math.sign(p.x) * 45; }
+        if (Math.abs(p.y) > 30) { p.vy = -p.vy; p.y = Math.sign(p.y) * 30; }
+      }
+
+      // Advance watchdog timers
+      for (const w of watchdogs) {
+        w.lastKickAgoMs += 200;
+        // Healthy watchdogs get kicked (reset) before they expire
+        if (!w.expires && w.lastKickAgoMs > w.periodMs * 0.8) {
+          w.lastKickAgoMs = Math.random() * w.periodMs * 0.3;
+        }
+        // Comms heartbeat occasionally recovers
+        if (w.expires && w.lastKickAgoMs > w.periodMs * 2 && Math.random() < 0.3) {
+          w.lastKickAgoMs = Math.random() * w.periodMs * 0.5;
+        }
+      }
+
+      // Advance traffic light
+      tlSecToChange -= TICK;
+      if (tlSecToChange <= 0) {
+        if (tlPhase === 'green') { tlPhase = 'yellow'; tlSecToChange = 3; }
+        else if (tlPhase === 'yellow') { tlPhase = 'red'; tlSecToChange = 8; }
+        else { tlPhase = 'green'; tlSecToChange = 10; }
+      }
+
+      renderPerception();
+      renderV2V();
+      renderWatchdogs();
+      renderTrafficLight();
+      renderFrameStats(performance.now());
+    }, 200);
+
+    // Initial render
+    renderPerception();
+    renderV2V();
+    renderWatchdogs();
+    renderTrafficLight();
+  </script>
+</body>
+</html>
