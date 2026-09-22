@@ -57,39 +57,65 @@
   <script src="assets/data.js"></script>
   <script src="assets/app.js"></script>
   <script>
-    // Attach login form listeners FIRST — before AVops.init()
-    // so they work even if init() throws an error.
+    // Phase 10f: Auto-login via query parameter — bypasses the form entirely.
+    // Usage: login.html?auto=admin   → logs in as admin, redirects to fleet.html
+    // Usage: login.html?auto=testdemo → logs in as testdemo, redirects to fleet.html
+    // This overcomes browser cache issues with the form buttons.
     (function() {
+      var params = new URLSearchParams(window.location.search);
+      var autoUser = params.get('auto');
+      if (autoUser) {
+        // Wait for app.js to load
+        function tryAutoLogin(attempts) {
+          if (typeof AVops !== 'undefined' && AVops.signIn) {
+            var password = autoUser === 'admin' ? 'admin' : 'demo';
+            var ok = AVops.signIn(autoUser, password);
+            if (ok) {
+              window.location.href = 'fleet.html';
+              return;
+            }
+          }
+          if (attempts > 0) {
+            setTimeout(function() { tryAutoLogin(attempts - 1); }, 200);
+          }
+        }
+        tryAutoLogin(10); // try 10 times over 2 seconds
+        return; // skip the rest of the script
+      }
+
+      // Normal login form listeners (attached BEFORE AVops.init)
       var fillAdmin = document.getElementById('fill-admin');
       var fillDemo = document.getElementById('fill-demo');
       var form = document.getElementById('login-form');
       var errEl = document.getElementById('login-error');
 
-      if (fillAdmin) fillAdmin.addEventListener('click', function() {
+      // Use onclick attribute as fallback (works even if addEventListener fails)
+      if (fillAdmin) fillAdmin.onclick = function() {
         document.getElementById('username').value = 'admin';
         document.getElementById('password').value = 'admin';
         if (errEl) errEl.classList.add('hidden');
-      });
+      };
 
-      if (fillDemo) fillDemo.addEventListener('click', function() {
+      if (fillDemo) fillDemo.onclick = function() {
         document.getElementById('username').value = 'testdemo';
         document.getElementById('password').value = 'demo';
         if (errEl) errEl.classList.add('hidden');
-      });
+      };
 
-      if (form) form.addEventListener('submit', function(e) {
+      if (form) form.onsubmit = function(e) {
         e.preventDefault();
         var username = document.getElementById('username').value.trim();
         var password = document.getElementById('password').value.trim();
-        if (!username) { if (errEl) { errEl.textContent = 'Username is required.'; errEl.classList.remove('hidden'); } return; }
-        if (!password) { if (errEl) { errEl.textContent = 'Password is required.'; errEl.classList.remove('hidden'); } return; }
+        if (!username) { if (errEl) { errEl.textContent = 'Username is required.'; errEl.classList.remove('hidden'); } return false; }
+        if (!password) { if (errEl) { errEl.textContent = 'Password is required.'; errEl.classList.remove('hidden'); } return false; }
         var success = AVops.signIn(username, password);
         if (success) {
           window.location.href = 'fleet.html';
         } else {
           if (errEl) { errEl.textContent = 'Invalid credentials. Use admin/admin or testdemo/demo.'; errEl.classList.remove('hidden'); }
         }
-      });
+        return false;
+      };
     })();
 
     // Now init AVops (wrapped in try/catch so errors don't break the form)
