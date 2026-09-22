@@ -42,6 +42,10 @@ PAGES=(
   "privacy.html"
   "live.html"
   "architecture.html"
+  "regulatory.html"
+  "blackbox.html"
+  "ota.html"
+  "audit.html"
   "404.html"
 )
 

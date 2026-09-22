@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Circular buffer (60s), crash-survivable flash storage, automated synthetic re-simulation pipeline.">
+  <title>Black Box &amp; Edge Logging · AV/Robotics Ops Center</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to content</a>
+  <div id="site-header"></div>
+  <div id="mobile-nav-host"></div>
+  <main id="main">
+    <div class="container">
+      <div class="page-header">
+        <h1>Automotive Black Box</h1>
+        <p>Circular buffer edge logging, crash-survivable storage, and automated synthetic re-simulation. The last 60 seconds of all sensor + control data is constantly captured in RAM; on trigger, it dumps to hardened flash for cloud re-simulation.</p>
+      </div>
+      <div class="callout">
+        <strong>Honest scope.</strong> The circular buffer, hardened flash, and cloud pipeline are NOT implemented in this UI. They are vehicle-side and cloud-side infrastructure. This page shows what these systems would look like to an operator.
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header"><div class="card-title">🔄 Circular buffer (60s window) — live fill levels</div></div>
+        <div class="card-body text-xs">
+          <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span style="width:120px; font-weight:600;">Camera (4×)</span><div style="flex:1; height:6px; background:var(--panel-2); border-radius:3px; overflow:hidden;"><div style="height:100%; width:92%; background:var(--accent);"></div></div><span class="mono text-muted" style="width:160px; text-align:right;">30 Hz · ~180 MB · 58s ago</span></div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span style="width:120px; font-weight:600;">LiDAR</span><div style="flex:1; height:6px; background:var(--panel-2); border-radius:3px; overflow:hidden;"><div style="height:100%; width:88%; background:var(--accent);"></div></div><span class="mono text-muted" style="width:160px; text-align:right;">20 Hz · ~24 MB · 56s ago</span></div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span style="width:120px; font-weight:600;">RADAR</span><div style="flex:1; height:6px; background:var(--panel-2); border-radius:3px; overflow:hidden;"><div style="height:100%; width:95%; background:var(--accent);"></div></div><span class="mono text-muted" style="width:160px; text-align:right;">25 Hz · ~2 MB · 59s ago</span></div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span style="width:120px; font-weight:600;">Control cmds</span><div style="flex:1; height:6px; background:var(--panel-2); border-radius:3px; overflow:hidden;"><div style="height:100%; width:91%; background:var(--accent);"></div></div><span class="mono text-muted" style="width:160px; text-align:right;">100 Hz · ~0.5 MB · 58s ago</span></div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span style="width:120px; font-weight:600;">Perception</span><div style="flex:1; height:6px; background:var(--panel-2); border-radius:3px; overflow:hidden;"><div style="height:100%; width:90%; background:var(--accent);"></div></div><span class="mono text-muted" style="width:160px; text-align:right;">5 Hz · ~1 MB · 58s ago</span></div>
+          <div style="display:flex; justify-content:space-between;"><span style="width:120px; font-weight:600;">Planning</span><div style="flex:1; height:6px; background:var(--panel-2); border-radius:3px; overflow:hidden;"><div style="height:100%; width:89%; background:var(--accent);"></div></div><span class="mono text-muted" style="width:160px; text-align:right;">5 Hz · ~0.2 MB · 57s ago</span></div>
+          <p class="text-muted" style="margin-top:8px;">Total RAM footprint: ~250 MB for 60s of all streams.</p>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header"><div class="card-title">💾 Crash-survivable storage (hardened flash)</div></div>
+        <div class="card-body text-xs">
+          <div style="border:1px solid var(--border); border-radius:6px; padding:8px; margin-bottom:8px;">
+            <strong>Trigger conditions:</strong>
+            <ul style="margin:4px 0 0 20px; color:var(--muted);">
+              <li>ASIL-D safety goal violation (braking/steering failure)</li>
+              <li>Manual disengagement (driver override)</li>
+              <li>Crash detected (accelerometer spike)</li>
+              <li>Watchdog expiry on safety-critical subsystem</li>
+              <li>Operator-initiated dump (from this UI)</li>
+            </ul>
+          </div>
+          <button class="btn btn-primary" id="dump-btn">📦 Dump buffer now (operator-initiated)</button>
+          <div id="dump-result" style="margin-top:8px;"></div>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header"><div class="card-title">🧪 Automated synthetic re-simulation pipeline</div></div>
+        <div class="card-body text-xs space-y-2">
+          <div style="display:flex; gap:8px; align-items:center;"><span class="mono" style="width:24px; text-align:center; background:var(--accent-dim); border-radius:50%; padding:2px 6px;">1</span><span style="width:120px; font-weight:600;">Ingest dump</span><span class="badge badge-active">Done</span><span class="text-muted">12 packages ingested this quarter</span></div>
+          <div style="display:flex; gap:8px; align-items:center;"><span class="mono" style="width:24px; text-align:center; background:var(--accent-dim); border-radius:50%; padding:2px 6px;">2</span><span style="width:120px; font-weight:600;">Parse streams</span><span class="badge badge-active">Done</span><span class="text-muted">Time-aligned: camera, LiDAR, control, perception</span></div>
+          <div style="display:flex; gap:8px; align-items:center;"><span class="mono" style="width:24px; text-align:center; background:var(--accent-dim); border-radius:50%; padding:2px 6px;">3</span><span style="width:120px; font-weight:600;">Identify failure</span><span class="badge badge-active">Done</span><span class="text-muted">Anomaly timestamp + 5s pre/post window</span></div>
+          <div style="display:flex; gap:8px; align-items:center;"><span class="mono" style="width:24px; text-align:center; background:var(--info-dim); border-radius:50%; padding:2px 6px;">4</span><span style="width:120px; font-weight:600;">Extract variables</span><span class="badge badge-info">Running</span><span class="text-muted">Weather, traffic, road geometry, sensor health</span></div>
+          <div style="display:flex; gap:8px; align-items:center;"><span class="mono" style="width:24px; text-align:center; background:var(--panel-2); border-radius:50%; padding:2px 6px;">5</span><span style="width:120px; font-weight:600;">Generate perm.</span><span class="badge badge-muted">Pending</span><span class="text-muted">~2,400 synthetic variations per package</span></div>
+          <div style="display:flex; gap:8px; align-items:center;"><span class="mono" style="width:24px; text-align:center; background:var(--panel-2); border-radius:50%; padding:2px 6px;">6</span><span style="width:120px; font-weight:600;">Re-simulate</span><span class="badge badge-muted">Pending</span><span class="text-muted">NVIDIA Isaac Sim, ~8h per package</span></div>
+          <div style="display:flex; gap:8px; align-items:center;"><span class="mono" style="width:24px; text-align:center; background:var(--panel-2); border-radius:50%; padding:2px 6px;">7</span><span style="width:120px; font-weight:600;">Compare + flag</span><span class="badge badge-muted">Pending</span><span class="text-muted">Scenarios reproducing failure → training data</span></div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <div id="site-footer"></div>
+  <script src="assets/data.js"></script>
+  <script src="assets/app.js"></script>
+  <script>
+    AVops.init('blackbox.html');
+    document.getElementById('dump-btn').addEventListener('click', function() {
+      document.getElementById('dump-result').innerHTML = '<div style="border:1px solid var(--accent); background:var(--accent-dim); border-radius:6px; padding:8px; font-family:ui-monospace,monospace; font-size:10px;">dump_id: dump_2026_09_22_001<br>vehicle_id: veh_04<br>timestamp: ' + new Date().toISOString() + '<br>software_version: v0.10.0<br>odd_hash: sha256:a3f8e1...<br>signature: ed25519:9c2b4f...<br>size: 247.8 MB<br>flash_remaining: 18.4 GB / 32 GB</div>';
+    });
+  </script>
+</body>
+</html>

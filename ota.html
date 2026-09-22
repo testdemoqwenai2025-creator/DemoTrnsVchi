@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Cloud vs private vehicle registry decision, 6-stage pipeline, per-class bundle status, safety constraints.">
+  <title>OTA Pipeline · AV/Robotics Ops Center</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to content</a>
+  <div id="site-header"></div>
+  <div id="mobile-nav-host"></div>
+  <main id="main">
+    <div class="container">
+      <div class="page-header">
+        <h1>OTA Pipeline Infrastructure</h1>
+        <p>How over-the-air updates are structured: cloud providers (AWS IoT / Azure IoT) vs a dedicated private vehicle registry. Hybrid is recommended for most AV deployments.</p>
+      </div>
+      <div class="callout">
+        <strong>Honest scope.</strong> The OTA pipeline is NOT implemented in this UI. It is cloud/vehicle infrastructure. This page shows what the pipeline would look like to an operator.
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header"><div class="card-title">☁ Cloud vs private vehicle registry</div></div>
+        <div class="card-body text-xs space-y-2">
+          <div style="border:1px solid var(--border); border-radius:6px; padding:8px;">
+            <strong>☁ AWS IoT Core + Jobs</strong><br><span class="text-muted">Pros: Mature, global, signed bundles. Cons: Vendor lock-in, per-device cost. When: Startup / early fleet.</span>
+          </div>
+          <div style="border:1px solid var(--border); border-radius:6px; padding:8px;">
+            <strong>☁ Azure IoT Hub + Device Update</strong><br><span class="text-muted">Pros: Same maturity, MS stack integration. Cons: Same lock-in. When: MS shop customers.</span>
+          </div>
+          <div style="border:1px solid var(--border); border-radius:6px; padding:8px;">
+            <strong>🗄 Private vehicle registry (self-hosted)</strong><br><span class="text-muted">Pros: No per-device cost at scale, full data sovereignty. Cons: Build everything yourself. When: >10k vehicles / defence.</span>
+          </div>
+          <div style="border:1px solid var(--accent); background:var(--accent-dim); border-radius:6px; padding:8px;">
+            <strong>✅ Hybrid (cloud CDN + private HSM)</strong> <span class="badge badge-active">Recommended</span><br><span class="text-muted">Pros: Best of both — cloud for distribution, private for signing. Cons: More moving parts. When: Most production AV deployments.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header"><div class="card-title">🌿 OTA pipeline stages (current rollout: v2.4.1)</div></div>
+        <div class="card-body text-xs space-y-2">
+          <div style="display:flex; gap:8px; align-items:center;"><span class="mono" style="width:24px; text-align:center; background:var(--accent-dim); border-radius:50%; padding:2px 6px;">1</span><span style="width:100px; font-weight:600;">Bundle build</span><span class="badge badge-active">Done</span><span class="text-muted">CI/CD produces signed bundle per vehicle class</span></div>
+          <div style="display:flex; gap:8px; align-items:center;"><span class="mono" style="width:24px; text-align:center; background:var(--accent-dim); border-radius:50%; padding:2px 6px;">2</span><span style="width:100px; font-weight:600;">Staging</span><span class="badge badge-active">Done</span><span class="text-muted">Engineering vehicles only</span></div>
+          <div style="display:flex; gap:8px; align-items:center;"><span class="mono" style="width:24px; text-align:center; background:var(--info-dim); border-radius:50%; padding:2px 6px;">3</span><span style="width:100px; font-weight:600;">Canary</span><span class="badge badge-info">Running</span><span class="text-muted">1% of fleet</span></div>
+          <div style="display:flex; gap:8px; align-items:center;"><span class="mono" style="width:24px; text-align:center; background:var(--panel-2); border-radius:50%; padding:2px 6px;">4</span><span style="width:100px; font-weight:600;">Ramp</span><span class="badge badge-muted">Pending</span><span class="text-muted">10% → 50% → 100%</span></div>
+          <div style="display:flex; gap:8px; align-items:center;"><span class="mono" style="width:24px; text-align:center; background:var(--panel-2); border-radius:50%; padding:2px 6px;">5</span><span style="width:100px; font-weight:600;">Verification</span><span class="badge badge-muted">Pending</span><span class="text-muted">Post-install smoke test per vehicle</span></div>
+          <div style="display:flex; gap:8px; align-items:center;"><span class="mono" style="width:24px; text-align:center; background:var(--panel-2); border-radius:50%; padding:2px 6px;">6</span><span style="width:100px; font-weight:600;">Complete</span><span class="badge badge-muted">Pending</span><span class="text-muted">100% of fleet on new bundle</span></div>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header"><div class="card-title">📦 Per-vehicle-class bundle status</div></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Vehicle class</th><th>Build version</th><th>Signing key</th><th>Updated %</th></tr></thead>
+            <tbody>
+              <tr><td class="capitalize">rover</td><td class="mono">v2.4.1</td><td class="mono text-muted">hsm-key-007</td><td><span class="badge badge-warn">75%</span></td></tr>
+              <tr><td class="capitalize">drone</td><td class="mono">v2.4.1</td><td class="mono text-muted">hsm-key-007</td><td><span class="badge badge-warn">50%</span></td></tr>
+              <tr><td class="capitalize">truck</td><td class="mono">v2.4.0</td><td class="mono text-muted">hsm-key-006</td><td><span class="badge badge-active">100%</span></td></tr>
+              <tr><td class="capitalize">pod</td><td class="mono">v2.4.1</td><td class="mono text-muted">hsm-key-007</td><td><span class="badge badge-warn">25%</span></td></tr>
+              <tr><td class="capitalize">manipulator</td><td class="mono">v2.3.8</td><td class="mono text-muted">hsm-key-005</td><td><span class="badge badge-active">100%</span></td></tr>
+              <tr><td class="capitalize">humanoid</td><td class="mono">v2.3.8</td><td class="mono text-muted">hsm-key-005</td><td><span class="badge badge-active">100%</span></td></tr>
+              <tr><td class="capitalize">amr</td><td class="mono">v2.3.8</td><td class="mono text-muted">hsm-key-005</td><td><span class="badge badge-active">100%</span></td></tr>
+              <tr><td class="capitalize">quadruped</td><td class="mono">v2.3.8</td><td class="mono text-muted">hsm-key-005</td><td><span class="badge badge-active">100%</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">🛡 Safety constraints</div></div>
+        <div class="card-body text-xs">
+          <ul style="margin:0 0 0 20px; color:var(--muted); line-height:1.8;">
+            <li>No OTA while driving — vehicle must be parked, charging, or in depot</li>
+            <li>Battery must be above 30% for the update</li>
+            <li>Rollback must always be possible (A/B partition mandatory)</li>
+            <li>Update is never forced — safety-driver or operator can defer</li>
+            <li>Every update is logged in the audit trail — version, vehicle, timestamp, signing key, rollback if any</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </main>
+  <div id="site-footer"></div>
+  <script src="assets/data.js"></script>
+  <script src="assets/app.js"></script>
+  <script>AVops.init('ota.html');</script>
+</body>
+</html>

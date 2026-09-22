@@ -49,6 +49,10 @@ const PAGES = [
   { path: '/privacy.html', file: 'privacy.html', expectedStatus: 200, titleIncludes: 'Privacy' },
   { path: '/live.html', file: 'live.html', expectedStatus: 200, titleIncludes: 'Live Demo' },
   { path: '/architecture.html', file: 'architecture.html', expectedStatus: 200, titleIncludes: 'Production Architecture' },
+  { path: '/regulatory.html', file: 'regulatory.html', expectedStatus: 200, titleIncludes: 'Regulatory Compliance' },
+  { path: '/blackbox.html', file: 'blackbox.html', expectedStatus: 200, titleIncludes: 'Black Box' },
+  { path: '/ota.html', file: 'ota.html', expectedStatus: 200, titleIncludes: 'OTA Pipeline' },
+  { path: '/audit.html', file: 'audit.html', expectedStatus: 200, titleIncludes: 'Audit Trail' },
   { path: '/404.html', file: '404.html', expectedStatus: 200, titleIncludes: '404' },
 ]
 

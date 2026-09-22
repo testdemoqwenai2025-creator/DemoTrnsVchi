@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Hash-chained audit trail, NHTSA SGO disengagement cause taxonomy, quarterly report placeholder.">
+  <title>Audit Trail &amp; Disengagement Reporting · AV/Robotics Ops Center</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to content</a>
+  <div id="site-header"></div>
+  <div id="mobile-nav-host"></div>
+  <main id="main">
+    <div class="container">
+      <div class="page-header">
+        <h1>Audit Trail &amp; Disengagement Reporting</h1>
+        <p>Regulatory bodies require transparent audit trails for safety-critical failures and manual safety-driver overrides (disengagements). Every event is hash-chained for tamper evidence.</p>
+      </div>
+      <div class="callout">
+        <strong>Honest scope.</strong> The audit trail and quarterly reports are placeholders. Real data requires the ROS 2 bridge. The disengagement cause taxonomy matches NHTSA / California DMV reporting requirements. The hash chain is a design pattern — every event would need HSM signing in production.
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header"><div class="card-title">🛡 Audit trail (hash-chained, tamper-evident)</div></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ID</th><th>Time</th><th>Vehicle</th><th>Event</th><th>Cause</th><th>Severity</th><th>Description</th><th>Prev hash</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">evt_001</td><td class="mono text-muted">08:42:15</td><td class="mono">veh_04</td><td><span class="badge badge-muted">disengagement</span></td><td class="mono" style="font-size:10px; color:var(--warn);">SW_FAILURE_PERCEPTION</td><td><span class="badge badge-fault">critical</span></td><td class="text-muted">Pedestrian not detected until 1.2s TTC — driver took control</td><td class="mono" style="font-size:10px;">a3f8e1...</td></tr>
+              <tr><td class="mono">evt_002</td><td class="mono text-muted">08:38:11</td><td class="mono">veh_01</td><td><span class="badge badge-muted">odd_violation</span></td><td class="mono" style="font-size:10px; color:var(--warn);">ODD_VIOLATION</td><td><span class="badge badge-warn">warning</span></td><td class="text-muted">Heavy rain exceeded L3 permit ODD</td><td class="mono" style="font-size:10px;">b7c2d9...</td></tr>
+              <tr><td class="mono">evt_003</td><td class="mono text-muted">08:35:02</td><td class="mono">veh_03</td><td><span class="badge badge-muted">safety_goal_violation</span></td><td class="mono" style="font-size:10px; color:var(--warn);">HW_FAILURE_ACTUATOR</td><td><span class="badge badge-fault">critical</span></td><td class="text-muted">Brake pressure below threshold for 200ms — ASIL-D violation</td><td class="mono" style="font-size:10px;">c8d3e0...</td></tr>
+              <tr><td class="mono">evt_004</td><td class="mono text-muted">08:31:48</td><td class="mono">veh_05</td><td><span class="badge badge-muted">disengagement</span></td><td class="mono" style="font-size:10px; color:var(--warn);">OPERATOR_INITIATED</td><td><span class="badge badge-info">info</span></td><td class="text-muted">Operator manually stopped for mission change</td><td class="mono" style="font-size:10px;">d9e4f1...</td></tr>
+              <tr><td class="mono">evt_005</td><td class="mono text-muted">08:28:33</td><td class="mono">veh_04</td><td><span class="badge badge-muted">ota_rollback</span></td><td class="mono" style="font-size:10px; color:var(--warn);">SW_FAILURE_OTHER</td><td><span class="badge badge-warn">warning</span></td><td class="text-muted">Post-update smoke test failed — rolled back to v2.4.0</td><td class="mono" style="font-size:10px;">e0f5a2...</td></tr>
+              <tr><td class="mono">evt_006</td><td class="mono text-muted">08:25:17</td><td class="mono">veh_09</td><td><span class="badge badge-muted">disengagement</span></td><td class="mono" style="font-size:10px; color:var(--warn);">SW_FAILURE_PLANNING</td><td><span class="badge badge-fault">critical</span></td><td class="text-muted">Planner chose lane change into occupied space — driver overrode</td><td class="mono" style="font-size:10px;">f1a6b3...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header"><div class="card-title">#️⃣ Hash chain integrity</div></div>
+        <div class="card-body text-xs">
+          <span class="badge badge-active">✓ Verified — 0 tampered events</span>
+          <span class="text-muted ml-4">Last verified: <span class="mono">just now</span></span>
+          <span class="text-muted ml-4">Chain depth: <span class="mono">6 events</span></span>
+          <span class="text-muted ml-4">Head hash: <span class="mono">f1a6b3...</span></span>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header"><div class="card-title">📄 Quarterly disengagement report — Q3 2026 (PLACEHOLDER)</div></div>
+        <div class="card-body text-xs">
+          <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border); padding:6px 0;"><strong>Reporting period</strong><span class="text-muted">Q3 2026 (Jul 1 — Sep 30)</span></div>
+          <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border); padding:6px 0;"><strong>Fleet summary</strong><span class="text-muted">12 vehicles, 4,820 autonomous miles, 6 disengagements</span></div>
+          <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border); padding:6px 0;"><strong>Disengagement by cause</strong><span class="text-muted">PERCEPTION: 2, PLANNING: 1, OPERATOR: 1, ACTUATOR: 1, ODD: 1</span></div>
+          <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border); padding:6px 0;"><strong>Time-of-day distribution</strong><span class="text-muted">Morning rush: 4, Midday: 1, Evening: 1</span></div>
+          <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border); padding:6px 0;"><strong>ODD violations</strong><span class="text-muted">1 (heavy rain exceeded L3 permit)</span></div>
+          <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border); padding:6px 0;"><strong>OTA rollbacks</strong><span class="text-muted">1 (v2.4.1 → v2.4.0 on veh_05)</span></div>
+          <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border); padding:6px 0;"><strong>Crash incidents</strong><span class="text-muted">0</span></div>
+          <div style="display:flex; justify-content:space-between; padding:6px 0;"><strong>Audit trail integrity</strong><span style="color:var(--accent);">Hash chain verified — 0 tampered events ✓</span></div>
+          <div style="margin-top:12px; display:flex; gap:8px; align-items:center;">
+            <button class="btn btn-primary">📥 Export quarterly report (JSON)</button>
+            <span class="text-muted" style="font-size:10px;">Does not auto-submit to regulators. Operator must file manually.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <div id="site-footer"></div>
+  <script src="assets/data.js"></script>
+  <script src="assets/app.js"></script>
+  <script>AVops.init('audit.html');</script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="ISO 26262, SOTIF, UN R157, NHTSA SGO, regional AV permits. Quarterly reporting cadence and placeholder.">
+  <title>Regulatory Compliance · AV/Robotics Ops Center</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to content</a>
+  <div id="site-header"></div>
+  <div id="mobile-nav-host"></div>
+  <main id="main">
+    <div class="container">
+      <div class="page-header">
+        <h1>Regulatory Compliance</h1>
+        <p>Regulatory bodies require transparent audit trails for safety-critical failures and manual safety-driver overrides. This page documents which standards the platform targets and what compliance evidence the UI must surface.</p>
+      </div>
+      <div class="callout">
+        <strong>Honest scope.</strong> The UI surfaces compliance evidence. It does <strong>not</strong> certify the vehicle. The vehicle manufacturer is responsible for ISO 26262 / SOTIF certification. We provide the visibility layer.
+      </div>
+      <div class="card mb-4">
+        <div class="card-header"><div class="card-title">🛡 Target regulatory frameworks</div></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Standard</th><th>Scope</th><th>Evidence the UI must surface</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td><strong>ISO 26262</strong></td><td>Functional safety (E/E systems)</td><td>ASIL classification, safety goals, FMEA, fault injection logs</td><td><span class="badge badge-warn">Partial</span></td></tr>
+              <tr><td><strong>ISO/PAS 21448 (SOTIF)</strong></td><td>Safety of the intended functionality</td><td>ODD boundaries, unknown-scenario logs, occlusion events</td><td><span class="badge badge-warn">Partial</span></td></tr>
+              <tr><td><strong>UN R157 (ALKS)</strong></td><td>Automated Lane Keeping Systems (L3 type approval)</td><td>ODD declaration, transition demand logs, fallback performance</td><td><span class="badge badge-fault">Not yet</span></td></tr>
+              <tr><td><strong>NHTSA SGO</strong></td><td>US Standing General Order — disengagement reporting</td><td>Disengagement count, route-mapped, quarterly export</td><td><span class="badge badge-fault">Not yet</span></td></tr>
+              <tr><td><strong>EU AV Act / GSR</strong></td><td>EU General Safety Regulation — DMS, ISA</td><td>Driver-side, not ops-side</td><td><span class="badge badge-fault">Not yet</span></td></tr>
+              <tr><td><strong>Regional AV permits</strong></td><td>CA DMV, AZ EO, UK AVT, Singapore AV rules</td><td>Permit ID, jurisdiction, validity, reporting cadence</td><td><span class="badge badge-fault">Not yet</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card mb-4">
+        <div class="card-header"><div class="card-title">📄 Quarterly reporting cadence</div></div>
+        <div class="card-body text-xs">
+          <p class="mb-4 text-muted">Regulators require quarterly reporting. The report must include:</p>
+          <ol style="margin:0 0 16px 20px;" class="text-muted">
+            <li>Disengagement summary (count, causes, locations, time-of-day distribution)</li>
+            <li>ODD deviations (times vehicle operated outside declared ODD)</li>
+            <li>Safety-critical alerts (count by severity, root-cause analysis)</li>
+            <li>OTA updates applied (version history, what changed, rollback events)</li>
+            <li>Crash incidents (if any, with NHTSA SGO 24-hour report attachments)</li>
+            <li>Audit trail integrity (proof that black-box logs are unmodified — hash chain)</li>
+          </ol>
+          <div style="border:1px dashed var(--border); border-radius:6px; padding:16px; text-align:center;">
+            <strong>Q3 2026 Report — PLACEHOLDER</strong><br>
+            <span class="text-muted">No real disengagement data available. See <a href="audit.html">/audit</a> for the audit trail.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <div id="site-footer"></div>
+  <script src="assets/data.js"></script>
+  <script src="assets/app.js"></script>
+  <script>AVops.init('regulatory.html');</script>
+</body>
+</html>
