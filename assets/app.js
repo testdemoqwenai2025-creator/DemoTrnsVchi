@@ -323,6 +323,30 @@
       '</span>';
   }
 
+  // ============================== REGULATORY FLOATING BUTTON (Phase 9c) ==============================
+  // A second floating button (above the Dynamic Demo FAB) that opens regulatory.html
+  // in a new tab. The user requested this so regulatory compliance is always one click
+  // away without navigating through the Deep Stack dropdown.
+  // Not shown on regulatory.html itself (no point popping out of the page you're on).
+  function applyRegulatoryButton(activeRoute) {
+    if (activeRoute === 'regulatory.html') return;
+    const existing = $('#regulatory-fab');
+    if (existing) return;
+    const fab = el('a', {
+      id: 'regulatory-fab',
+      href: 'regulatory.html',
+      target: '_blank',
+      rel: 'noopener',
+      'aria-label': 'Open Regulatory Compliance in a new tab',
+      title: 'Regulatory Compliance (opens in new tab)',
+    });
+    fab.style.cssText = 'position:fixed; bottom:104px; left:16px; z-index:30; display:flex; align-items:center; gap:6px; padding:6px 14px; border-radius:999px; background:var(--panel); color:var(--accent); font-size:11px; font-weight:500; text-decoration:none; border:1px solid var(--accent); box-shadow:0 2px 8px rgba(0,0,0,0.3); transition:transform 0.15s, box-shadow 0.15s; cursor:pointer; backdrop-filter:blur(8px);';
+    fab.innerHTML = '🛡 <span>Regulatory</span>';
+    fab.addEventListener('mouseenter', () => { fab.style.transform = 'translateY(-2px)'; fab.style.boxShadow = '0 4px 12px rgba(16,185,129,0.3)'; });
+    fab.addEventListener('mouseleave', () => { fab.style.transform = ''; fab.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3)'; });
+    document.body.appendChild(fab);
+  }
+
   // ============================== LIVE DEMO FLOATING BUTTON (Phase 9) ==============================
   // A floating "Launch Live Demo" button on every page (bottom-left, complementing
   // the stream indicator at bottom-right). Opens /live.html in a NEW TAB so the
@@ -368,6 +392,9 @@
 
     // Inject floating Live Demo button (Phase 9)
     applyLiveDemoButton(activeRoute);
+
+    // Inject floating Regulatory button (Phase 9c — above the Dynamic Demo FAB)
+    applyRegulatoryButton(activeRoute);
 
     // Init chat if on chat page
     initChat();
