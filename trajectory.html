@@ -18,6 +18,9 @@
         <p>4D (X, Y, Z, T) trajectory via quintic polynomials, MPC for online constrained optimization, PID/Pure Pursuit as low-level fallback, and Smith predictors for actuator-delay compensation.</p>
       </div>
 
+      <!-- Deep-link banner (from /planning?behaviour=…) -->
+      <div id="deep-link-banner" class="hidden"></div>
+
       <div class="grid-2 mb-4">
         <div class="card">
           <div class="card-header"><div class="card-title">⚙ MPC solver status</div></div>
@@ -60,5 +63,25 @@
   <script src="assets/data.js"></script>
   <script src="assets/app.js"></script>
   <script>AVops.init('trajectory.html');</script>
+  <script>
+    // Phase 5a: cross-module deep link. ?behaviour= from /planning shows a
+    // banner describing the trajectory shape implied by the chosen behaviour.
+    const NOTES = {
+      lane_keep: 'Straight-line trajectory, minimal lateral jerk.',
+      lane_change_left: 'Quintic lateral shift -3m over 4s, capped jerk.',
+      lane_change_right: 'Quintic lateral shift +3m over 4s, capped jerk.',
+      yield: 'Deceleration profile, target speed 0 kph at yield point.',
+      stop: 'Hard deceleration to 0 kph, comfort-bounded jerk.',
+      overtake: 'Lateral shift + lane advance + return, total 8s.',
+      emergency_brake: 'Maximum deceleration, jerk unbounded.',
+    };
+    const b = AVops.qs('behaviour');
+    if (b) {
+      const banner = document.getElementById('deep-link-banner');
+      banner.className = 'callout';
+      banner.innerHTML = '<strong>Deep-linked from /planning</strong> · behaviour: <code>' + b + '</code>' +
+        '<br><span class="text-xs text-muted">' + (NOTES[b] || 'Custom trajectory shape.') + '</span>';
+    }
+  </script>
 </body>
 </html>

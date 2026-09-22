@@ -18,6 +18,9 @@
         <p>Real-time decision state machine, arbitration tree across safety/legality/comfort/progress scores, and a scene-context card.</p>
       </div>
 
+      <!-- Deep-link banner (from /prediction?trigger=…) -->
+      <div id="deep-link-banner" class="hidden"></div>
+
       <div class="card mb-4">
         <div class="card-header"><div class="card-title">🌿 Current state: <span class="badge badge-active">lane_keep</span></div></div>
         <div class="card-body text-sm">
@@ -77,5 +80,24 @@
   <script src="assets/data.js"></script>
   <script src="assets/app.js"></script>
   <script>AVops.init('planning.html');</script>
+  <script>
+    // Phase 5a: cross-module deep link. ?trigger= from /prediction highlights
+    // the matching decision log entry and adds a "→ Trajectory" link.
+    const fromUrl = AVops.qs('trigger');
+    if (fromUrl) {
+      const banner = document.getElementById('deep-link-banner');
+      banner.className = 'callout';
+      banner.innerHTML = '<strong>Deep-linked from /prediction</strong> · trigger: <code>' + fromUrl + '</code>' +
+        ' · <a class="btn btn-primary" href="trajectory.html?behaviour=lane_keep" style="padding:2px 10px; font-size:11px;">→ Send current behaviour to Trajectory</a>';
+      // Highlight the matching decision log entry
+      const entries = document.querySelectorAll('.card-body > div');
+      entries.forEach(d => {
+        if (d.innerText && d.innerText.includes(fromUrl)) {
+          d.style.borderColor = 'var(--accent)';
+          d.style.background = 'var(--accent-dim)';
+        }
+      });
+    }
+  </script>
 </body>
 </html>
