@@ -283,6 +283,46 @@
     return msg;
   }
 
+  // ============================== STREAM INDICATOR (Phase 8) ==============================
+  // Visible on every page so the operator always knows whether they're
+  // viewing production telemetry, synthetic test scenarios, or a replay.
+  // Stored in localStorage so the choice persists across pages.
+  const STREAM_KEY = 'avops.dataStream';
+  function getStream() {
+    return localStorage.getItem(STREAM_KEY) || 'production';
+  }
+  function setStream(s) {
+    localStorage.setItem(STREAM_KEY, s);
+    applyStreamIndicator();
+  }
+  function applyStreamIndicator() {
+    let indicator = $('#stream-indicator');
+    if (!indicator) {
+      indicator = el('div', { id: 'stream-indicator', role: 'status', 'aria-live': 'polite', 'aria-label': 'Data stream' });
+      indicator.style.cssText = 'position:fixed; bottom:60px; right:16px; z-index:30; display:flex; align-items:center; gap:8px; padding:6px 12px; border-radius:6px; font-size:11px; font-family:ui-monospace,monospace; backdrop-filter:blur(8px); box-shadow:0 2px 8px rgba(0,0,0,0.3);';
+      document.body.appendChild(indicator);
+    }
+    const s = getStream();
+    const labels = {
+      production: { label: 'PRODUCTION', tone: 'var(--accent)', bg: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.4)' },
+      synthetic:  { label: 'SYNTHETIC',  tone: 'var(--warn)',   bg: 'rgba(245,158,11,0.15)', border: '1px solid rgba(245,158,11,0.4)' },
+      replay:     { label: 'REPLAY',     tone: 'var(--info)',   bg: 'rgba(56,189,248,0.15)', border: '1px solid rgba(56,189,248,0.4)' },
+    };
+    const meta = labels[s] || labels.production;
+    indicator.style.color = meta.tone;
+    indicator.style.background = meta.bg;
+    indicator.style.border = meta.border;
+    indicator.innerHTML = '<strong>' + meta.label + '</strong>' +
+      ' <span style="opacity:0.6;">·</span> ' +
+      '<span style="opacity:0.8;">' + (s === 'production' ? 'live_telemetry_feed' : s === 'synthetic' ? 'synth_scenario_007' : 'replay_session_2026_09_22') + '</span>' +
+      (s === 'synthetic' ? ' <span style="color:var(--warn);" title="Synthetic data — not for live operational decisions">⚠</span>' : '') +
+      ' <span style="margin-left:8px; padding-left:8px; border-left:1px solid currentColor; opacity:0.6;">' +
+        '<button onclick="AVops.setStream(\'production\')" style="background:none; border:none; color:inherit; cursor:pointer; padding:0 4px; font-size:10px;">PROD</button>' +
+        '<button onclick="AVops.setStream(\'synthetic\')" style="background:none; border:none; color:inherit; cursor:pointer; padding:0 4px; font-size:10px;">SYNT</button>' +
+        '<button onclick="AVops.setStream(\'replay\')" style="background:none; border:none; color:inherit; cursor:pointer; padding:0 4px; font-size:10px;">REPL</button>' +
+      '</span>';
+  }
+
   // ============================== INIT ==============================
   function init(activeRoute) {
     applyTheme(getStoredTheme());
@@ -298,6 +338,9 @@
     // Inject footer
     const footerHost = $('#site-footer');
     if (footerHost) footerHost.appendChild(buildFooter());
+
+    // Inject stream indicator (Phase 8)
+    applyStreamIndicator();
 
     // Init chat if on chat page
     initChat();
@@ -315,5 +358,7 @@
     respondTo,
     setStoredTheme,
     getStoredTheme,
+    getStream,
+    setStream,
   });
 })(window);
