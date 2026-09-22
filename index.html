@@ -150,7 +150,8 @@
         <span>🟢 <code>18 online</code></span>
         <span>⚠️ <code>2 active alerts</code></span>
         <span>⏱️ <code>telemetry @ 5 Hz</code></span>
-        <span>🌐 <code>11 routes · MPA</code></span>
+        <span>🌐 <code>19 routes · MPA</code></span>
+        <span>🧠 <code>14 module compartments</code></span>
         <span>🔒 <code>NDA-free preview</code></span>
       </div>
       <div class="private-note">
@@ -251,6 +252,82 @@
               <span class="module-tag">M6 · Knowledge</span>
               <h3>Knowledge Vault</h3>
               <p>Searchable AV/Robotics encyclopedia with related-code / asset-class cross-navigation.</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Deep AV subsystems <span style="font-size:11px; padding:2px 8px; border-radius:999px; background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3); color:#10b981; vertical-align:middle; margin-left:8px;">Phase 3</span></h2>
+        <p>
+          Phase 3 added eight deep AV subsystem panels on top of the operational layer — perception
+          fusion, SLAM, prediction, behavioural planning, trajectory/MPC, V2X, fault tolerance, and
+          simulation/HIL. Each is its own route, mock-driven, and consistent with the
+          compartmentalized architecture.
+        </p>
+        <div class="modules">
+          <article class="module">
+            <img class="module-img" src="screenshots/perception-module.png" alt="Perception &amp; Sensor Fusion" loading="lazy" />
+            <div class="module-body">
+              <span class="module-tag">M7 · Perception</span>
+              <h3>Sensor Fusion</h3>
+              <p>LiDAR/RADAR/RGB-D/Ultrasonic sync, 3D object detection with EKF/UKF, semantic segmentation, weather filtering.</p>
+            </div>
+          </article>
+          <article class="module">
+            <img class="module-img" src="screenshots/localization-module.png" alt="Localization &amp; SLAM" loading="lazy" />
+            <div class="module-body">
+              <span class="module-tag">M8 · Localization</span>
+              <h3>SLAM &amp; HD Maps</h3>
+              <p>HD map SVG with ego pose, SLAM-vs-GNSS divergence, RTK precision, visual-odometer backup.</p>
+            </div>
+          </article>
+          <article class="module">
+            <img class="module-img" src="screenshots/prediction-module.png" alt="Prediction &amp; Intent" loading="lazy" />
+            <div class="module-body">
+              <span class="module-tag">M9 · Prediction</span>
+              <h3>Intent &amp; Forecast</h3>
+              <p>Pedestrian intent, multi-hypothesis trajectory cones, occlusion map, scene graph.</p>
+            </div>
+          </article>
+          <article class="module">
+            <img class="module-img" src="screenshots/planning-module.png" alt="Behavioural Planning" loading="lazy" />
+            <div class="module-body">
+              <span class="module-tag">M10 · Planning</span>
+              <h3>Behavioural Planner</h3>
+              <p>Decision state machine, arbitration tree across safety/legality/comfort/progress.</p>
+            </div>
+          </article>
+          <article class="module">
+            <img class="module-img" src="screenshots/trajectory-module.png" alt="Trajectory &amp; Motion Control" loading="lazy" />
+            <div class="module-body">
+              <span class="module-tag">M11 · Trajectory</span>
+              <h3>MPC &amp; Motion Control</h3>
+              <p>4D quintic trajectory, MPC solver status, PID vs Pure Pursuit comparison, Smith predictor.</p>
+            </div>
+          </article>
+          <article class="module">
+            <img class="module-img" src="screenshots/v2x-module.png" alt="V2X &amp; Multi-Agent" loading="lazy" />
+            <div class="module-body">
+              <span class="module-tag">M12 · V2X</span>
+              <h3>V2X &amp; Multi-Agent</h3>
+              <p>V2V mesh, V2I traffic light, decentralized fleet consensus, HSM crypto verification.</p>
+            </div>
+          </article>
+          <article class="module">
+            <img class="module-img" src="screenshots/safety-module.png" alt="Fault Tolerance &amp; Fail-Safe" loading="lazy" />
+            <div class="module-body">
+              <span class="module-tag">M13 · Safety</span>
+              <h3>Fault Tolerance</h3>
+              <p>Fail-safe FSM, primary/secondary redundancy, watchdog timers, ISO 26262 ASIL.</p>
+            </div>
+          </article>
+          <article class="module">
+            <img class="module-img" src="screenshots/simulation-module.png" alt="Simulation / CI-CD / HIL" loading="lazy" />
+            <div class="module-body">
+              <span class="module-tag">M14 · Simulation</span>
+              <h3>Sim / CI-CD / HIL</h3>
+              <p>Scenario runs, CI/CD pipeline stages, HIL bench status, scenario pass-rate library.</p>
             </div>
           </article>
         </div>
