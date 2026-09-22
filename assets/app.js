@@ -337,11 +337,11 @@
       href: 'live.html',
       target: '_blank',
       rel: 'noopener',
-      'aria-label': 'Launch Live Demo in a new tab',
-      title: 'Launch Live Demo (opens in new tab)',
+      'aria-label': 'Launch dynamic demo in a new tab',
+      title: 'Dynamic Demo (opens in new tab — 5 Hz real-time simulation)',
     });
     fab.style.cssText = 'position:fixed; bottom:60px; left:16px; z-index:30; display:flex; align-items:center; gap:6px; padding:8px 16px; border-radius:999px; background:var(--accent); color:#0a0e0d; font-size:12px; font-weight:600; text-decoration:none; box-shadow:0 4px 12px rgba(16,185,129,0.4); transition:transform 0.15s, box-shadow 0.15s; cursor:pointer;';
-    fab.innerHTML = '▶ <span>Live Demo</span>';
+    fab.innerHTML = '▶ <span>Dynamic Demo</span>';
     fab.addEventListener('mouseenter', () => { fab.style.transform = 'translateY(-2px)'; fab.style.boxShadow = '0 6px 16px rgba(16,185,129,0.5)'; });
     fab.addEventListener('mouseleave', () => { fab.style.transform = ''; fab.style.boxShadow = '0 4px 12px rgba(16,185,129,0.4)'; });
     document.body.appendChild(fab);
