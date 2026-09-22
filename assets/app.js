@@ -339,7 +339,7 @@
     let indicator = $('#stream-indicator');
     if (!indicator) {
       indicator = el('div', { id: 'stream-indicator', role: 'status', 'aria-live': 'polite', 'aria-label': 'Data stream' });
-      indicator.style.cssText = 'position:fixed; bottom:60px; right:16px; z-index:30; display:flex; align-items:center; gap:8px; padding:6px 12px; border-radius:6px; font-size:11px; font-family:ui-monospace,monospace; backdrop-filter:blur(8px); box-shadow:0 2px 8px rgba(0,0,0,0.3);';
+      indicator.style.cssText = 'position:fixed; bottom:52px; right:16px; z-index:30; display:flex; align-items:center; gap:6px; padding:8px 14px; border-radius:8px; font-size:12px; font-family:ui-monospace,monospace; backdrop-filter:blur(8px); box-shadow:0 2px 12px rgba(0,0,0,0.4);';
       document.body.appendChild(indicator);
     }
     const s = getStream();
@@ -373,8 +373,12 @@
       const isCurrent = s === target;
       return '<button onclick="AVops.setStream(\'' + target + '\')" ' +
         (allowed ? '' : 'disabled ') +
-        'style="background:none; border:none; color:inherit; cursor:' + (allowed ? 'pointer' : 'not-allowed') + '; padding:0 4px; font-size:10px;' + (allowed ? '' : 'opacity:0.3;') + (isCurrent ? ' text-decoration:underline;' : '') + '" ' +
-        'title="' + (allowed ? 'Switch to ' + target : 'Locked — ' + (role || 'not signed in') + ' role cannot access ' + target) + '">' +
+        'style="background:' + (isCurrent ? 'currentColor' : 'transparent') + ';' +
+        'color:' + (isCurrent ? 'var(--bg)' : 'inherit') + ';' +
+        'border:1px solid currentColor; border-radius:4px; cursor:' + (allowed ? 'pointer' : 'not-allowed') + ';' +
+        'padding:2px 8px; margin:0 2px; font-size:11px; font-weight:600;' +
+        (allowed ? '' : 'opacity:0.3;') + '"' +
+        ' title="' + (allowed ? 'Switch to ' + target : 'Locked — ' + (role || 'not signed in') + ' role cannot access ' + target) + '">' +
         (allowed ? '' : '🔒 ') + target.slice(0, 4).toUpperCase() +
         '</button>';
     }).join('');
