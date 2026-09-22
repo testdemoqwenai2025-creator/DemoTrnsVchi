@@ -60,7 +60,9 @@
     const u = authenticate(username, password);
     if (!u) return false;
     localStorage.setItem(SESSION_KEY, JSON.stringify(u));
-    global.location.reload();
+    // Don't reload here — let the caller redirect after we return true.
+    // Dispatch custom event so other components (stream indicator, header) update.
+    global.dispatchEvent(new Event('avops:session'));
     return true;
   }
   function signOut() {
@@ -458,6 +460,17 @@
 
     // Inject floating Regulatory button (Phase 9c — above the Dynamic Demo FAB)
     applyRegulatoryButton(activeRoute);
+
+    // Listen for session changes (Phase 10d — update header + stream indicator without reload)
+    global.addEventListener('avops:session', function() {
+      // Rebuild header (to show role badge / login button)
+      if (headerHost) {
+        headerHost.innerHTML = '';
+        headerHost.appendChild(buildHeader(activeRoute));
+      }
+      // Update stream indicator (to reflect role-based gating)
+      applyStreamIndicator();
+    });
 
     // Init chat if on chat page
     initChat();

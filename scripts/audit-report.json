@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-22T13:30:46.255Z",
+  "timestamp": "2026-09-22T13:40:57.869Z",
   "baseUrl": "http://localhost:8889",
   "summary": {
     "totalPages": 26,
@@ -491,7 +491,7 @@
       "url": "http://localhost:8889/assets/app.js",
       "status": 200,
       "ok": true,
-      "sizeBytes": 24178
+      "sizeBytes": 24801
     },
     {
       "asset": "assets/data.js",
